@@ -4,6 +4,9 @@ import { Work } from '@/lib/microcms';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+// メタデータはlayout.tsxのtemplateで設定されます
+// ページタイトルは動的に設定
+
 export default function WorksPage() {
   const [works, setWorks] = useState<Work[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<'すべて' | 'アニメ' | 'ゲーム' | '吹き替え' | 'CM・ナレーション' | 'CDドラマ' | 'ラジオ' | '舞台' | '映画' | 'ドラマ' | 'ボイスコミック' | 'その他'>('すべて');

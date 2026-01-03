@@ -83,8 +83,50 @@ export default async function HomePage() {
     });
   };
 
+  // 構造化データ（JSON-LD）
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: '菅野真衣非公式ファンサイト',
+    url: 'https://mai-kanno-fansite.net',
+    description: '声優・俳優 菅野真衣さんの非公式ファンサイト。出演作品、イベント情報、プロフィールなどを掲載しています。',
+    inLanguage: 'ja-JP',
+    about: {
+      '@type': 'Person',
+      name: '菅野真衣',
+      jobTitle: ['声優', '俳優'],
+      sameAs: [
+        'https://twitter.com/may_0324',
+        'https://www.instagram.com/mai_kanno_/',
+      ],
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'ホーム',
+        item: 'https://mai-kanno-fansite.net',
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white">
+      {/* 構造化データの埋め込み */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      
       <div className="max-w-5xl mx-auto px-4 py-12">
         {/* ヘッダー */}
         <header className="text-center mb-16 py-12">
