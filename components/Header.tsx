@@ -13,6 +13,7 @@ export default function Header() {
     { href: '/profile', label: 'プロフィール' },
     { href: '/works', label: '出演作品' },
     { href: '/events', label: 'イベント' },
+    { href: '/schedules', label: 'スケジュール' },
     { href: '/news', label: '更新履歴' },
   ];
 

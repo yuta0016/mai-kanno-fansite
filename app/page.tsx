@@ -1,4 +1,4 @@
-import { client, Work, Event, MicroCMSListResponse } from '@/lib/microcms';
+import { client, Work, Event, Schedule, MicroCMSListResponse } from '@/lib/microcms';
 import Link from 'next/link';
 
 export const revalidate = 60;
@@ -67,9 +67,38 @@ async function getUpcomingEvent(): Promise<Event | null> {
   }
 }
 
+async function getUpcomingSchedules(): Promise<Schedule[]> {
+  try {
+    const now = new Date();
+    
+    const data = await client.get<MicroCMSListResponse<Schedule>>({
+      endpoint: 'schedules',
+      queries: {
+        orders: 'scheduledDate',
+        limit: 100,
+      },
+    });
+    
+    // 現在日時より未来で、ステータスが「予定」または「配信中」のスケジュールのみ抽出
+    const upcomingSchedules = data.contents.filter(schedule => {
+      const scheduledDate = new Date(schedule.scheduledDate);
+      const isFuture = scheduledDate >= now;
+      const isUpcoming = schedule.status.includes('予定') || schedule.status.includes('配信中');
+      return isFuture && isUpcoming;
+    });
+    
+    // 日付順でソートして最大3件返す
+    return upcomingSchedules.slice(0, 3);
+  } catch (error) {
+    console.error('Error fetching upcoming schedules:', error);
+    return [];
+  }
+}
+
 export default async function HomePage() {
   const latestWorks = await getLatestWorks();
   const upcomingEvent = await getUpcomingEvent();
+  const upcomingSchedules = await getUpcomingSchedules();
 
   // 日付をフォーマット
   const formatDate = (dateString: string) => {
@@ -79,6 +108,20 @@ export default async function HomePage() {
       month: 'long',
       day: 'numeric',
       weekday: 'short',
+      timeZone: 'Asia/Tokyo',
+    });
+  };
+
+  // 日時をフォーマット
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('ja-JP', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
       timeZone: 'Asia/Tokyo',
     });
   };
@@ -271,6 +314,145 @@ export default async function HomePage() {
                     イベント詳細を見る →
                   </Link>
                 </div>
+              </div>
+            </section>
+          )}
+
+          {/* 直近のスケジュール */}
+          {upcomingSchedules.length > 0 && (
+            <section className="bg-white rounded-lg shadow-md p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  <svg
+                    className="w-6 h-6 text-pink-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  直近のスケジュール
+                </h2>
+                <Link
+                  href="/schedules"
+                  className="text-pink-600 hover:text-pink-700 font-medium text-sm flex items-center gap-1"
+                >
+                  すべて見る
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {upcomingSchedules.map((schedule) => (
+                  <div
+                    key={schedule.id}
+                    className="border border-gray-200 rounded-lg p-4 hover:border-pink-300 hover:shadow-md transition-all"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                            {schedule.scheduleType}
+                          </span>
+                          {schedule.status.map((status) => (
+                            <span
+                              key={status}
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                status === '予定'
+                                  ? 'bg-green-100 text-green-800'
+                                  : status === '配信中'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              {status}
+                            </span>
+                          ))}
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-1">
+                          {schedule.title}
+                        </h3>
+                        <div className="text-sm text-gray-600 mb-1">
+                          📅 {formatDateTime(schedule.scheduledDate)}
+                        </div>
+                        {schedule.platform && (
+                          <div className="text-sm text-gray-600">
+                            🎙️ {schedule.platform}
+                          </div>
+                        )}
+                        {schedule.performer && (
+                          <div className="text-sm text-gray-600">
+                            👥 {schedule.performer}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {schedule.officialUrl && (
+                          <Link
+                            href={schedule.officialUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-pink-600 hover:text-pink-700 font-medium text-sm"
+                          >
+                            詳細
+                            <svg
+                              className="w-4 h-4 ml-1"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                              />
+                            </svg>
+                          </Link>
+                        )}
+                        {schedule.broadcastPageUrl && (
+                          <Link
+                            href={schedule.broadcastPageUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm"
+                          >
+                            配信
+                            <svg
+                              className="w-4 h-4 ml-1"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                              />
+                            </svg>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
           )}

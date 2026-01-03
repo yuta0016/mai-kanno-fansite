@@ -90,3 +90,23 @@ export interface Event {
   publishedAt: string;
   revisedAt: string;
 }
+
+// スケジュールの型定義
+export interface Schedule {
+  id: string;
+  title: string; // スケジュール名
+  scheduleType: 'ラジオ' | '生放送・配信' | '発売' | 'その他'; // スケジュール種別
+  scheduledDate: string; // 配信・放送日時
+  endDate?: string; // 終了日時（配信期間がある場合）
+  platform?: string; // プラットフォーム・局名（例: YouTube, ニコニコ生放送, ラジオ局名）
+  performer?: string; // 出演者
+  description?: string; // 内容説明
+  officialUrl?: string; // 公式URL
+  broadcastPageUrl?: string; // 配信ページURL
+  status: ('予定' | '配信中' | '終了')[]; // ステータス（配列）
+  displayOrder?: number; // 表示順
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  revisedAt: string;
+}
