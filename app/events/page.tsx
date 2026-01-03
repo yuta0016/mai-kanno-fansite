@@ -65,7 +65,7 @@ export default function EventsPage() {
     'その他',
   ];
 
-  const statusOrder = ['開催予定', '終了', '中止'];
+  const statusOrder: ('開催予定' | '終了' | '中止')[] = ['開催予定', '終了', '中止'];
 
   // フィルタリング後のイベント
   const filteredEvents = events.filter(event => {
