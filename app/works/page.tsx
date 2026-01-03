@@ -261,11 +261,11 @@ export default function WorksPage() {
                         key={`${work.id}-${index}`}
                         className="border-l-4 border-pink-200 pl-4 py-2 hover:bg-gray-50 transition-colors"
                       >
-                        <div className="flex flex-wrap items-baseline gap-3">
-                          <span className="text-sm font-medium text-gray-500 min-w-[60px]">
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-2 sm:gap-3">
+                          <span className="text-sm font-medium text-gray-500 sm:min-w-[60px]">
                             {work.releaseYear}年
                           </span>
-                          <h3 className="text-lg font-semibold text-gray-900 flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 sm:flex-1 break-words">
                             {work.title}
                           </h3>
                           <span className="text-sm text-pink-600 font-medium">
@@ -274,17 +274,17 @@ export default function WorksPage() {
                         </div>
                         {work.description && (
                           <div
-                            className="mt-2 text-sm text-gray-600 pl-[72px]"
+                            className="mt-2 text-sm text-gray-600 sm:pl-[72px] break-words [&_a]:break-all"
                             dangerouslySetInnerHTML={{ __html: work.description }}
                           />
                         )}
                         {work.officialUrl && (
-                          <div className="mt-2 pl-[72px]">
+                          <div className="mt-2 sm:pl-[72px]">
                             <a
                               href={work.officialUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline break-all"
                             >
                               公式サイト →
                             </a>
@@ -309,11 +309,11 @@ export default function WorksPage() {
                   key={`${work.id}-${index}`}
                   className="border-l-4 border-pink-200 pl-4 py-2 hover:bg-gray-50 transition-colors"
                 >
-                  <div className="flex flex-wrap items-baseline gap-3">
-                    <span className="text-sm font-medium text-gray-500 min-w-[60px]">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-2 sm:gap-3">
+                    <span className="text-sm font-medium text-gray-500 sm:min-w-[60px]">
                       {work.releaseYear}年
                     </span>
-                    <h3 className="text-lg font-semibold text-gray-900 flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 sm:flex-1 break-words">
                       {work.title}
                     </h3>
                     <span className="text-sm text-pink-600 font-medium">
@@ -322,17 +322,17 @@ export default function WorksPage() {
                   </div>
                   {work.description && (
                     <div
-                      className="mt-2 text-sm text-gray-600 pl-[72px]"
+                      className="mt-2 text-sm text-gray-600 sm:pl-[72px] break-words [&_a]:break-all"
                       dangerouslySetInnerHTML={{ __html: work.description }}
                     />
                   )}
                   {work.officialUrl && (
-                    <div className="mt-2 pl-[72px]">
+                    <div className="mt-2 sm:pl-[72px]">
                       <a
                         href={work.officialUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline break-all"
                       >
                         公式サイト →
                       </a>
