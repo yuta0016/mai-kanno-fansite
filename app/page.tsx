@@ -79,6 +79,7 @@ export default async function HomePage() {
       month: 'long',
       day: 'numeric',
       weekday: 'short',
+      timeZone: 'Asia/Tokyo',
     });
   };
 
