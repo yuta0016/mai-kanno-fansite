@@ -15,9 +15,10 @@ export default function SchedulesPage() {
       try {
         const response = await fetch('/api/schedules');
         const data = await response.json();
-        setSchedules(data);
+        setSchedules(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching schedules:', error);
+        setSchedules([]);
       } finally {
         setIsLoading(false);
       }

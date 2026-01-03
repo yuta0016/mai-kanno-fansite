@@ -29,9 +29,6 @@ export async function GET() {
     return NextResponse.json(allSchedules);
   } catch (error) {
     console.error('Error fetching schedules:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch schedules' },
-      { status: 500 }
-    );
+    return NextResponse.json([]);
   }
 }
