@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 export default function WorksPage() {
   const [works, setWorks] = useState<Work[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('すべて');
+  const [selectedCategory, setSelectedCategory] = useState<'すべて' | 'アニメ' | 'ゲーム' | '吹き替え' | 'CM・ナレーション' | 'CDドラマ' | 'ラジオ' | '舞台' | '映画' | 'ドラマ' | 'ボイスコミック' | 'その他'>('すべて');
   const [selectedYear, setSelectedYear] = useState<string>('すべて');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -41,7 +41,7 @@ export default function WorksPage() {
   }, []);
 
   // 作品種別の順序を定義
-  const workTypeOrder = [
+  const workTypeOrder: ('アニメ' | 'ゲーム' | '吹き替え' | 'CM・ナレーション' | 'CDドラマ' | 'ラジオ' | '舞台' | '映画' | 'ドラマ' | 'ボイスコミック' | 'その他')[] = [
     'アニメ',
     'ゲーム',
     '吹き替え',
