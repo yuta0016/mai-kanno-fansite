@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
-  const [selectedStatus, setSelectedStatus] = useState<string>('すべて');
+  const [selectedStatus, setSelectedStatus] = useState<'すべて' | '開催予定' | '終了' | '中止'>('すべて');
   const [selectedType, setSelectedType] = useState<string>('すべて');
   const [loading, setLoading] = useState(true);
 
