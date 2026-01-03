@@ -245,14 +245,14 @@ export default async function HomePage() {
                     key={work.id}
                     className="border-l-4 border-pink-300 pl-4 py-3 hover:bg-gray-50 transition-colors"
                   >
-                    <div className="flex flex-wrap items-baseline gap-3">
-                      <span className="text-sm font-medium text-gray-500 min-w-[60px]">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-2 sm:gap-3">
+                      <span className="text-sm font-medium text-gray-500 sm:min-w-[60px]">
                         {work.releaseYear}年
                       </span>
                       <span className="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded">
                         {work.workType}
                       </span>
-                      <h3 className="text-lg font-semibold text-gray-900 flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 sm:flex-1 break-words">
                         {work.title}
                       </h3>
                       <span className="text-sm text-pink-600 font-medium">
