@@ -35,11 +35,20 @@ export const metadata: Metadata = {
     title: '菅野真衣非公式ファンサイト | 出演作品・イベント情報',
     description: '声優 菅野真衣さんの非公式ファンサイト。出演作品、イベント情報、プロフィールなどを掲載しています。',
     siteName: '菅野真衣非公式ファンサイト',
+    images: [
+      {
+        url: '/ogp.png',
+        width: 1200,
+        height: 630,
+        alt: '菅野真衣非公式ファンサイト',
+      },
+    ],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: '菅野真衣非公式ファンサイト | 出演作品・イベント情報',
     description: '声優 菅野真衣さんの非公式ファンサイト。出演作品、イベント情報、プロフィールなどを掲載しています。',
+    images: ['/ogp.png'],
   },
   robots: {
     index: true,
