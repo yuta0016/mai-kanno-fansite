@@ -21,9 +21,11 @@ async function getLatestWorks(): Promise<Work[]> {
 
 async function getUpcomingItems(): Promise<Event[]> {
   try {
+    // 日本時間（JST）で現在日時を取得
     const now = new Date();
+    const jstNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
     // 今日の日付の0時0分0秒を取得（当日終了まで表示するため）
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const today = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate());
     
     const eventsData = await client.get<MicroCMSListResponse<Event>>({
       endpoint: 'events',
@@ -36,19 +38,17 @@ async function getUpcomingItems(): Promise<Event[]> {
     const events = eventsData.contents || [];
     
     const upcomingEvents = events.filter((event: Event) => {
+      // microCMSの日付を日本時間として解釈
       const eventDate = new Date(event.eventDate);
-      // 今日の日付（時刻を除く）
-      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      // 明日の日付（時刻を除く）
-      const tomorrowStart = new Date(todayStart);
-      tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+      const jstEventDate = new Date(eventDate.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
       
       // イベント日（時刻を除く）
-      const eventDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+      const eventDay = new Date(jstEventDate.getFullYear(), jstEventDate.getMonth(), jstEventDate.getDate());
       
       // 今日以降のイベントを表示
-      const isTodayOrFuture = eventDay >= todayStart;
+      const isTodayOrFuture = eventDay >= today;
       const isUpcoming = event.status.includes('開催予定') || event.status.includes('予定') || event.status.includes('配信中');
+      
       return isTodayOrFuture && isUpcoming;
     }).sort((a: Event, b: Event) => {
       const dateA = new Date(a.eventDate);
