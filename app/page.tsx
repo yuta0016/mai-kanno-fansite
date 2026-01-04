@@ -37,12 +37,19 @@ async function getUpcomingItems(): Promise<Event[]> {
     
     const upcomingEvents = events.filter((event: Event) => {
       const eventDate = new Date(event.eventDate);
-      // イベント日の0時0分0秒を取得
+      // 今日の日付（時刻を除く）
+      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      // 明日の日付（時刻を除く）
+      const tomorrowStart = new Date(todayStart);
+      tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+      
+      // イベント日（時刻を除く）
       const eventDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
-      // 当日を含む未来のイベントを表示
-      const isFuture = eventDay >= today;
+      
+      // 今日以降のイベントを表示
+      const isTodayOrFuture = eventDay >= todayStart;
       const isUpcoming = event.status.includes('開催予定') || event.status.includes('予定') || event.status.includes('配信中');
-      return isFuture && isUpcoming;
+      return isTodayOrFuture && isUpcoming;
     }).sort((a: Event, b: Event) => {
       const dateA = new Date(a.eventDate);
       const dateB = new Date(b.eventDate);
