@@ -74,17 +74,20 @@ export interface News {
 export interface Event {
   id: string;
   eventName: string; // イベント名
-  eventType: 'ライブ' | 'トークイベント' | 'リリースイベント' | '公開生放送・収録' | 'ファンミーティング' | 'その他'; // イベント種別
+  eventType: 'ライブ' | 'トークイベント' | 'リリースイベント' | '公開生放送・収録' | 'ファンミーティング' | 'ラジオ' | '生放送・配信' | '発売' | 'その他'; // イベント種別
   eventDate: string; // 開催日
+  endDate?: string; // 終了日時（配信終了など）
   openTime?: string; // 開場時間
   startTime?: string; // 開演時間
   venueName?: string; // 会場名
+  platform?: string; // プラットフォーム・局名（YouTube, ニコニコ生放送など）
   performers?: string; // 出演者
   description?: string; // イベント内容
   participationMethod?: string; // 参加方法
   priceInfo?: string; // 料金情報
   officialUrl?: string; // 公式サイトURL
-  status: ('開催予定' | '終了' | '中止')[]; // ステータス（配列）
+  broadcastPageUrl?: string; // 配信ページURL
+  status: ('開催予定' | '終了' | '中止' | '予定' | '配信中')[]; // ステータス（配列）
   createdAt: string;
   updatedAt: string;
   publishedAt: string;

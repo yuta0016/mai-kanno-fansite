@@ -30,7 +30,12 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({ works: allWorks });
+    // IDの重複を除去
+    const uniqueWorks = Array.from(
+      new Map(allWorks.map(work => [work.id, work])).values()
+    );
+
+    return NextResponse.json({ works: uniqueWorks });
   } catch (error) {
     console.error('Failed to fetch works:', error);
     return NextResponse.json(

@@ -1,104 +1,68 @@
-import { client, Work, Event, Schedule, MicroCMSListResponse } from '@/lib/microcms';
+import { Work, Event } from '@/lib/microcms';
 import Link from 'next/link';
 
 export const revalidate = 60;
 
 async function getLatestWorks(): Promise<Work[]> {
   try {
-    const data = await client.get<MicroCMSListResponse<Work>>({
-      endpoint: 'works',
-      queries: {
-        orders: '-releaseYear,-displayOrder',
-        limit: 5,
-      },
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/works`, {
+      next: { revalidate: 60 },
     });
-    return data.contents;
+    if (!response.ok) throw new Error('Failed to fetch works');
+    const data = await response.json();
+    return data.works || [];
   } catch (error) {
     console.error('Error fetching latest works:', error);
     return [];
   }
 }
 
-async function getUpcomingEvent(): Promise<Event | null> {
+async function getUpcomingItems(): Promise<Event[]> {
   try {
     const now = new Date();
+    // 今日の日付の0時0分0秒を取得（当日終了まで表示するため）
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
-    const data = await client.get<MicroCMSListResponse<Event>>({
-      endpoint: 'events',
-      queries: {
-        orders: 'eventDate',
-        limit: 100,
-      },
+    const eventsRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events`, {
+      next: { revalidate: 60 },
     });
     
-    // 現在日時より未来で、ステータスが「開催予定」のイベントのみ抽出
-    const upcomingEvents = data.contents.filter(event => {
-      const eventDate = new Date(event.eventDate);
-      const isFuture = eventDate >= now;
-      const isUpcoming = event.status.includes('開催予定');
-      return isFuture && isUpcoming;
-    });
-    
-    if (upcomingEvents.length === 0) {
-      return null;
+    if (!eventsRes.ok) {
+      throw new Error('Failed to fetch items');
     }
     
-    // 日付順、同じ日付の場合は開演時間順でソート
-    upcomingEvents.sort((a, b) => {
+    const eventsData = await eventsRes.json();
+    const events = eventsData.events || [];
+    
+    const upcomingEvents = events.filter((event: Event) => {
+      const eventDate = new Date(event.eventDate);
+      // イベント日の0時0分0秒を取得
+      const eventDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+      // 当日を含む未来のイベントを表示
+      const isFuture = eventDay >= today;
+      const isUpcoming = event.status.includes('開催予定') || event.status.includes('予定') || event.status.includes('配信中');
+      return isFuture && isUpcoming;
+    }).sort((a: Event, b: Event) => {
       const dateA = new Date(a.eventDate);
       const dateB = new Date(b.eventDate);
-      
-      // 日付が異なる場合は日付順
       if (dateA.getTime() !== dateB.getTime()) {
         return dateA.getTime() - dateB.getTime();
       }
-      
-      // 同じ日付の場合は開演時間でソート
-      const timeA = a.startTime || '99:99'; // 時間がない場合は最後に
+      const timeA = a.startTime || '99:99';
       const timeB = b.startTime || '99:99';
       return timeA.localeCompare(timeB);
-    });
+    }).slice(0, 3);
     
-    // 最も近い未来のイベントを返す
-    return upcomingEvents[0];
+    return upcomingEvents;
   } catch (error) {
-    console.error('Error fetching upcoming event:', error);
-    return null;
-  }
-}
-
-async function getUpcomingSchedules(): Promise<Schedule[]> {
-  try {
-    const now = new Date();
-    
-    const data = await client.get<MicroCMSListResponse<Schedule>>({
-      endpoint: 'schedules',
-      queries: {
-        orders: 'scheduledDate',
-        limit: 100,
-      },
-    });
-    
-    // 現在日時より未来で、ステータスが「予定」または「配信中」のスケジュールのみ抽出
-    const upcomingSchedules = data.contents.filter(schedule => {
-      const scheduledDate = new Date(schedule.scheduledDate);
-      const isFuture = scheduledDate >= now;
-      const isUpcoming = schedule.status.includes('予定') || schedule.status.includes('配信中');
-      return isFuture && isUpcoming;
-    });
-    
-    // 日付順でソートして最大3件返す
-    return upcomingSchedules.slice(0, 3);
-  } catch (error) {
-    console.error('Error fetching upcoming schedules:', error);
+    console.error('Error fetching upcoming items:', error);
     return [];
   }
 }
 
 export default async function HomePage() {
   const latestWorks = await getLatestWorks();
-  const upcomingEvent = await getUpcomingEvent();
-  const upcomingSchedules = await getUpcomingSchedules();
+  const upcomingEvents = await getUpcomingItems();
 
   // 日付をフォーマット
   const formatDate = (dateString: string) => {
@@ -212,10 +176,10 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* 直近のイベント情報 */}
-          {upcomingEvent && (
+          {/* 直近のイベント・スケジュール */}
+          {upcomingEvents.length > 0 && (
             <section className="bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg shadow-lg p-8 text-white">
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-6">
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -230,229 +194,63 @@ export default async function HomePage() {
                   />
                 </svg>
                 <h2 className="text-2xl font-bold">
-                  直近のイベント
+                  直近のイベント・スケジュール
                 </h2>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-                <div className="mb-3">
-                  <span className="inline-block bg-white/20 px-3 py-1 rounded-full text-sm font-medium mb-2">
-                    {upcomingEvent.eventType}
-                  </span>
-                  <h3 className="text-2xl font-bold mb-2">
-                    {upcomingEvent.eventName}
-                  </h3>
-                </div>
-                <div className="space-y-2 text-white/90">
-                  <div className="flex items-center gap-2">
-                    <svg
-                      className="w-5 h-5 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <p className="font-medium">{formatDate(upcomingEvent.eventDate)}</p>
-                  </div>
-                  {(upcomingEvent.openTime || upcomingEvent.startTime) && (
-                    <div className="flex items-center gap-2">
-                      <svg
-                        className="w-5 h-5 flex-shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      <p>
-                        {upcomingEvent.openTime && `開場 ${upcomingEvent.openTime}`}
-                        {upcomingEvent.openTime && upcomingEvent.startTime && ' / '}
-                        {upcomingEvent.startTime && `開演 ${upcomingEvent.startTime}`}
-                      </p>
-                    </div>
-                  )}
-                  {upcomingEvent.venueName && (
-                    <div className="flex items-center gap-2">
-                      <svg
-                        className="w-5 h-5 flex-shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                      <p>{upcomingEvent.venueName}</p>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-6">
-                  <Link
-                    href={`/events#${upcomingEvent.id}`}
-                    className="inline-block bg-white text-pink-600 hover:bg-pink-50 font-semibold px-6 py-2 rounded-full transition-colors"
-                  >
-                    イベント詳細を見る →
-                  </Link>
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* 直近のスケジュール */}
-          {upcomingSchedules.length > 0 && (
-            <section className="bg-white rounded-lg shadow-md p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                  <svg
-                    className="w-6 h-6 text-pink-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  直近のスケジュール
-                </h2>
-                <Link
-                  href="/schedules"
-                  className="text-pink-600 hover:text-pink-700 font-medium text-sm flex items-center gap-1"
-                >
-                  すべて見る
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
-              </div>
+              
               <div className="space-y-4">
-                {upcomingSchedules.map((schedule) => (
-                  <div
-                    key={schedule.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:border-pink-300 hover:shadow-md transition-all"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                            {schedule.scheduleType}
-                          </span>
-                          {schedule.status.map((status) => (
-                            <span
-                              key={status}
-                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                status === '予定'
-                                  ? 'bg-green-100 text-green-800'
-                                  : status === '配信中'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              {status}
-                            </span>
-                          ))}
+                {upcomingEvents.map((event) => (
+                  <div key={event.id} className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+                    <div className="mb-3">
+                      <span className="inline-block bg-white/20 px-3 py-1 rounded-full text-sm font-medium mb-2">
+                        {event.eventType}
+                      </span>
+                      <h3 className="text-xl font-bold mb-2">
+                        {event.eventName}
+                      </h3>
+                    </div>
+                    <div className="space-y-2 text-white/90 text-sm">
+                      <div>📅 {formatDate(event.eventDate)}</div>
+                      {(event.openTime || event.startTime) && (
+                        <div>
+                          🕒 {event.openTime && `開場 ${event.openTime}`}
+                          {event.openTime && event.startTime && ' / '}
+                          {event.startTime && `開演 ${event.startTime}`}
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">
-                          {schedule.title}
-                        </h3>
-                        <div className="text-sm text-gray-600 mb-1">
-                          📅 {formatDateTime(schedule.scheduledDate)}
-                        </div>
-                        {schedule.platform && (
-                          <div className="text-sm text-gray-600">
-                            🎙️ {schedule.platform}
-                          </div>
-                        )}
-                        {schedule.performer && (
-                          <div className="text-sm text-gray-600">
-                            👥 {schedule.performer}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {schedule.officialUrl && (
-                          <Link
-                            href={schedule.officialUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center text-pink-600 hover:text-pink-700 font-medium text-sm"
-                          >
-                            詳細
-                            <svg
-                              className="w-4 h-4 ml-1"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                              />
-                            </svg>
-                          </Link>
-                        )}
-                        {schedule.broadcastPageUrl && (
-                          <Link
-                            href={schedule.broadcastPageUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium text-sm"
-                          >
-                            配信
-                            <svg
-                              className="w-4 h-4 ml-1"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                              />
-                            </svg>
-                          </Link>
-                        )}
-                      </div>
+                      )}
+                      {event.venueName && <div>📍 {event.venueName}</div>}
+                      {event.platform && <div>🎙️ {event.platform}</div>}
+                      {event.performers && <div>👥 {event.performers}</div>}
+                    </div>
+                    <div className="mt-4 flex gap-3">
+                      <Link
+                        href={`/events#${event.id}`}
+                        className="inline-block bg-white text-pink-600 hover:bg-pink-50 font-semibold px-6 py-2 rounded-full transition-colors text-sm"
+                      >
+                        詳細を見る →
+                      </Link>
+                      {event.broadcastPageUrl && (
+                        <Link
+                          href={event.broadcastPageUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block bg-white text-blue-600 hover:bg-blue-50 font-semibold px-6 py-2 rounded-full transition-colors text-sm"
+                        >
+                          配信
+                        </Link>
+                      )}
                     </div>
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-6 text-center">
+                <Link
+                  href="/events"
+                  className="inline-block bg-white text-pink-600 hover:bg-pink-50 font-semibold px-8 py-3 rounded-full transition-colors"
+                >
+                  すべてのイベント・スケジュールを見る →
+                </Link>
               </div>
             </section>
           )}
@@ -464,9 +262,9 @@ export default async function HomePage() {
             </h2>
             {latestWorks.length > 0 ? (
               <div className="space-y-4">
-                {latestWorks.map((work) => (
+                {latestWorks.map((work, index) => (
                   <div
-                    key={work.id}
+                    key={`${work.id}-${index}`}
                     className="border-l-4 border-pink-300 pl-4 py-3 hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-2 sm:gap-3">
