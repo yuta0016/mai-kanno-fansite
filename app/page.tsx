@@ -1,16 +1,18 @@
-import { Work, Event } from '@/lib/microcms';
+import { client, Work, Event, MicroCMSListResponse } from '@/lib/microcms';
 import Link from 'next/link';
 
 export const revalidate = 60;
 
 async function getLatestWorks(): Promise<Work[]> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/works`, {
-      next: { revalidate: 60 },
+    const data = await client.get<MicroCMSListResponse<Work>>({
+      endpoint: 'works',
+      queries: {
+        orders: '-releaseYear,-displayOrder',
+        limit: 5,
+      },
     });
-    if (!response.ok) throw new Error('Failed to fetch works');
-    const data = await response.json();
-    return data.works || [];
+    return data.contents;
   } catch (error) {
     console.error('Error fetching latest works:', error);
     return [];
@@ -23,16 +25,15 @@ async function getUpcomingItems(): Promise<Event[]> {
     // 今日の日付の0時0分0秒を取得（当日終了まで表示するため）
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
-    const eventsRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events`, {
-      next: { revalidate: 60 },
+    const eventsData = await client.get<MicroCMSListResponse<Event>>({
+      endpoint: 'events',
+      queries: {
+        orders: 'eventDate',
+        limit: 100,
+      },
     });
     
-    if (!eventsRes.ok) {
-      throw new Error('Failed to fetch items');
-    }
-    
-    const eventsData = await eventsRes.json();
-    const events = eventsData.events || [];
+    const events = eventsData.contents || [];
     
     const upcomingEvents = events.filter((event: Event) => {
       const eventDate = new Date(event.eventDate);
