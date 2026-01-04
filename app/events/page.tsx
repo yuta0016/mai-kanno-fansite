@@ -19,6 +19,8 @@ type UnifiedItem = {
   description?: string;
   officialUrl?: string;
   broadcastPageUrl?: string;
+  priceInfo?: string;
+  participationMethod?: string;
 };
 
 export default function EventsPage() {
@@ -48,6 +50,8 @@ export default function EventsPage() {
           description: event.description,
           officialUrl: event.officialUrl,
           broadcastPageUrl: event.broadcastPageUrl,
+          priceInfo: event.priceInfo,
+          participationMethod: event.participationMethod,
         }));
         
         const allItems = eventItems.sort((a, b) => {
@@ -287,6 +291,18 @@ export default function EventsPage() {
                     {item.performer && (
                       <div className="mb-3 text-gray-700">
                         <span className="font-medium">出演:</span> {item.performer}
+                      </div>
+                    )}
+
+                    {item.priceInfo && (
+                      <div className="mb-3 text-gray-700">
+                        <span className="font-medium">料金:</span> {item.priceInfo}
+                      </div>
+                    )}
+
+                    {item.participationMethod && (
+                      <div className="mb-3 text-gray-700">
+                        <span className="font-medium">参加方法:</span> {item.participationMethod}
                       </div>
                     )}
 

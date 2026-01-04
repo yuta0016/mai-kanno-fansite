@@ -152,7 +152,8 @@ export default async function HomePage() {
             Mai Kanno Fan Site
           </p>
           <p className="text-sm text-gray-500">
-            非公式ファンサイトです
+            非公式ファンサイトです<br/>
+            菅野真衣さん及び所属事務所とは一切関係ありません
           </p>
         </header>
 
