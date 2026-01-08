@@ -145,10 +145,10 @@ export default async function HomePage() {
       <div className="max-w-5xl mx-auto px-4 py-12">
         {/* ヘッダー */}
         <header className="text-center mb-16 py-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
             菅野真衣 ファンサイト
           </h1>
-          <p className="text-xl text-gray-600 mb-2">
+          <p className="text-lg sm:text-xl text-gray-600 mb-2">
             Mai Kanno Fan Site
           </p>
           <p className="text-sm text-gray-500">
