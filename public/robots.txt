@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /schedules
 
 Sitemap: https://mai-kanno-fansite.net/sitemap.xml
