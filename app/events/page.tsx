@@ -27,6 +27,7 @@ export default function EventsPage() {
   const [items, setItems] = useState<UnifiedItem[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string>('すべて');
   const [selectedType, setSelectedType] = useState<string>('すべて');
+  const [selectedYear, setSelectedYear] = useState<string>('すべて');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -107,11 +108,21 @@ export default function EventsPage() {
     return Array.from(new Set(items.flatMap(item => item.status)));
   }, [items]);
 
+  const allYears = useMemo(() => {
+    const years = items.map(item => {
+      const date = new Date(item.date);
+      return date.getFullYear().toString();
+    });
+    return Array.from(new Set(years)).sort((a, b) => Number(b) - Number(a)); // 降順ソート
+  }, [items]);
+
   const filteredItems = items.filter(item => {
     const statusMatch = selectedStatus === 'すべて' || item.status.includes(selectedStatus);
     const itemType = Array.isArray(item.type) ? item.type[0] : item.type;
     const typeMatch = selectedType === 'すべて' || itemType === selectedType;
-    return statusMatch && typeMatch;
+    const itemYear = new Date(item.date).getFullYear().toString();
+    const yearMatch = selectedYear === 'すべて' || itemYear === selectedYear;
+    return statusMatch && typeMatch && yearMatch;
   });
 
   const formatDate = (dateString: string) => {
@@ -172,7 +183,7 @@ export default function EventsPage() {
         </header>
 
         <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <h3 className="text-sm font-semibold text-gray-700 mb-3">ステータス</h3>
               <div className="flex flex-wrap gap-2">
@@ -226,6 +237,35 @@ export default function EventsPage() {
                     }`}
                   >
                     {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">年</h3>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedYear('すべて')}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    selectedYear === 'すべて'
+                      ? 'bg-pink-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  すべて
+                </button>
+                {allYears.map((year) => (
+                  <button
+                    key={year}
+                    onClick={() => setSelectedYear(year)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedYear === year
+                        ? 'bg-pink-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {year}年
                   </button>
                 ))}
               </div>
