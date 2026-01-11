@@ -28,6 +28,9 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
+  alternates: {
+    canonical: 'https://mai-kanno-fansite.net',
+  },
   openGraph: {
     type: 'website',
     locale: 'ja_JP',
