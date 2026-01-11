@@ -153,6 +153,9 @@ export default function EventsPage() {
     if (['開催予定', '予定'].includes(status)) {
       return 'bg-green-100 text-green-800';
     }
+    if (status === '発売中') {
+      return 'bg-blue-100 text-blue-800';
+    }
     if (status === '配信中') {
       return 'bg-yellow-100 text-yellow-800';
     }
