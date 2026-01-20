@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { client } from '@/lib/microcms';
 import type { Event, MicroCMSListResponse } from '@/lib/microcms';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 60; // 60秒ごとに再検証
+
 export async function GET() {
   try {
     const allEvents: Event[] = [];
@@ -15,6 +18,8 @@ export async function GET() {
         queries: {
           limit,
           offset,
+          // キャッシュバスティング用タイムスタンプ
+          _: Date.now().toString(),
         },
       });
 
@@ -27,7 +32,10 @@ export async function GET() {
       offset += limit;
     }
 
-    return NextResponse.json({ events: allEvents });
+    const response = NextResponse.json({ events: allEvents });
+    // キャッシュ制御: 60秒間キャッシュし、その後は再検証
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+    return response;
   } catch (error) {
     console.error('Error fetching events:', error);
     return NextResponse.json(

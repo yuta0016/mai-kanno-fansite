@@ -3,6 +3,7 @@ import { client } from '@/lib/microcms';
 import { Work } from '@/lib/microcms';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 60; // 60秒ごとに再検証
 
 export async function GET() {
   try {
@@ -18,6 +19,8 @@ export async function GET() {
           limit,
           offset,
           orders: '-releaseYear',
+          // キャッシュバスティング用タイムスタンプ
+          _: Date.now().toString(),
         },
       });
 
@@ -35,7 +38,10 @@ export async function GET() {
       new Map(allWorks.map(work => [work.id, work])).values()
     );
 
-    return NextResponse.json({ works: uniqueWorks });
+    const response = NextResponse.json({ works: uniqueWorks });
+    // キャッシュ制御: 60秒間キャッシュし、その後は再検証
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+    return response;
   } catch (error) {
     console.error('Failed to fetch works:', error);
     return NextResponse.json(
