@@ -19,8 +19,6 @@ export async function GET() {
           limit,
           offset,
           orders: '-releaseYear',
-          // キャッシュバスティング用タイムスタンプ
-          _: Date.now().toString(),
         },
       });
 

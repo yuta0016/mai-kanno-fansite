@@ -18,8 +18,6 @@ export async function GET() {
         queries: {
           limit,
           offset,
-          // キャッシュバスティング用タイムスタンプ
-          _: Date.now().toString(),
         },
       });
 
