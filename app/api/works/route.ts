@@ -10,7 +10,6 @@ export async function GET() {
     let offset = 0;
     const limit = 100;
     let hasMore = true;
-    let totalCount = 0;
 
     while (hasMore) {
       const response = await client.get({
@@ -22,12 +21,6 @@ export async function GET() {
         },
       });
 
-      if (offset === 0) {
-        totalCount = response.totalCount;
-        console.log(`Total works in microCMS: ${totalCount}`);
-      }
-
-      console.log(`Fetched ${response.contents.length} works at offset ${offset}`);
       allWorks = [...allWorks, ...response.contents];
       
       if (response.contents.length < limit) {
@@ -37,14 +30,10 @@ export async function GET() {
       }
     }
 
-    console.log(`Total fetched: ${allWorks.length} works`);
-
     // IDの重複を除去
     const uniqueWorks = Array.from(
       new Map(allWorks.map(work => [work.id, work])).values()
     );
-
-    console.log(`After deduplication: ${uniqueWorks.length} unique works`);
 
     return NextResponse.json({ works: uniqueWorks });
   } catch (error) {
