@@ -183,6 +183,35 @@ export default function EventsPage() {
       };
     };
     
+    // 日付に1日を加算する関数（文字列操作のみ）
+    const addOneDay = (year: string, month: string, day: string): { year: string; month: string; day: string } => {
+      const y = parseInt(year);
+      const m = parseInt(month);
+      const d = parseInt(day);
+      
+      // 各月の日数
+      const daysInMonth = [31, (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+      
+      let newDay = d + 1;
+      let newMonth = m;
+      let newYear = y;
+      
+      if (newDay > daysInMonth[m - 1]) {
+        newDay = 1;
+        newMonth = m + 1;
+        if (newMonth > 12) {
+          newMonth = 1;
+          newYear = y + 1;
+        }
+      }
+      
+      return {
+        year: newYear.toString(),
+        month: newMonth.toString().padStart(2, '0'),
+        day: newDay.toString().padStart(2, '0'),
+      };
+    };
+    
     let dateString = '';
     
     // 時間情報がある場合
@@ -212,21 +241,13 @@ export default function EventsPage() {
       if (item.endDate) {
         const endDate = extractDate(item.endDate);
         // Googleカレンダーは終日イベントの終了日を+1日する必要がある
-        const endDateObj = new Date(`${endDate.year}-${endDate.month}-${endDate.day}`);
-        endDateObj.setDate(endDateObj.getDate() + 1);
-        const nextYear = endDateObj.getFullYear();
-        const nextMonth = (endDateObj.getMonth() + 1).toString().padStart(2, '0');
-        const nextDay = endDateObj.getDate().toString().padStart(2, '0');
-        const endDateOnly = `${nextYear}${nextMonth}${nextDay}`;
+        const nextDate = addOneDay(endDate.year, endDate.month, endDate.day);
+        const endDateOnly = `${nextDate.year}${nextDate.month}${nextDate.day}`;
         dateString = `${dateOnly}/${endDateOnly}`;
       } else {
         // 終了日がない場合は開始日の翌日を終了日とする
-        const dateObj = new Date(`${year}-${month}-${day}`);
-        dateObj.setDate(dateObj.getDate() + 1);
-        const nextYear = dateObj.getFullYear();
-        const nextMonth = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-        const nextDay = dateObj.getDate().toString().padStart(2, '0');
-        const nextDateOnly = `${nextYear}${nextMonth}${nextDay}`;
+        const nextDate = addOneDay(year, month, day);
+        const nextDateOnly = `${nextDate.year}${nextDate.month}${nextDate.day}`;
         dateString = `${dateOnly}/${nextDateOnly}`;
       }
     }
