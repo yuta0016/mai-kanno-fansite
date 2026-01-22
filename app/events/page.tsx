@@ -165,6 +165,48 @@ export default function EventsPage() {
     return 'bg-gray-100 text-gray-800';
   };
 
+  // Googleカレンダーに追加するURLを生成
+  const generateGoogleCalendarUrl = (item: UnifiedItem) => {
+    const title = encodeURIComponent(item.title);
+    
+    // 開始日時を取得
+    const startDate = new Date(item.date);
+    let dateString = '';
+    
+    // 時間情報がある場合
+    if (item.startTime) {
+      const [hours, minutes] = item.startTime.split(':');
+      startDate.setHours(parseInt(hours), parseInt(minutes), 0);
+      dateString = startDate.toISOString().replace(/-|:|\.\d+/g, '');
+    } else {
+      // 終日イベントの場合
+      const dateOnly = startDate.toISOString().split('T')[0].replace(/-/g, '');
+      if (item.endDate) {
+        const endDate = new Date(item.endDate);
+        endDate.setDate(endDate.getDate() + 1); // Googleカレンダーは終日イベントの終了日を+1日する必要がある
+        const endDateOnly = endDate.toISOString().split('T')[0].replace(/-/g, '');
+        dateString = `${dateOnly}/${endDateOnly}`;
+      } else {
+        dateString = `${dateOnly}/${dateOnly}`;
+      }
+    }
+    
+    // 詳細情報を生成
+    let details = '';
+    if (item.venue) details += `会場: ${item.venue}\n`;
+    if (item.platform) details += `配信: ${item.platform}\n`;
+    if (item.performer) details += `出演: ${item.performer}\n`;
+    if (item.priceInfo) details += `料金: ${item.priceInfo}\n`;
+    if (item.participationMethod) details += `参加方法: ${item.participationMethod}\n`;
+    if (item.officialUrl) details += `\n公式サイト: ${item.officialUrl}`;
+    if (item.broadcastPageUrl) details += `\n配信ページ: ${item.broadcastPageUrl}`;
+    
+    const detailsEncoded = encodeURIComponent(details);
+    const location = encodeURIComponent(item.venue || item.platform || '');
+    
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateString}&details=${detailsEncoded}&location=${location}`;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -403,6 +445,27 @@ export default function EventsPage() {
                           </svg>
                         </Link>
                       )}
+                      <Link
+                        href={generateGoogleCalendarUrl(item)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-green-600 hover:text-green-700 font-medium"
+                      >
+                        <svg
+                          className="w-4 h-4 mr-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        <span>カレンダーに追加</span>
+                      </Link>
                     </div>
                   </div>
 
