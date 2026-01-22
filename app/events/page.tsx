@@ -169,51 +169,63 @@ export default function EventsPage() {
   const generateGoogleCalendarUrl = (item: UnifiedItem) => {
     const title = encodeURIComponent(item.title);
     
-    // 日付文字列をJSTとして解釈
-    const dateStr = item.date;
+    // 日付文字列から直接YYYYMMDDを抽出（タイムゾーン変換を避ける）
+    // item.dateは "YYYY-MM-DD" または "YYYY-MM-DDTHH:mm:ss" 形式
+    const extractDate = (dateStr: string): { year: string; month: string; day: string } => {
+      const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) {
+        throw new Error(`Invalid date format: ${dateStr}`);
+      }
+      return {
+        year: match[1],
+        month: match[2],
+        day: match[3],
+      };
+    };
+    
     let dateString = '';
     
     // 時間情報がある場合
     if (item.startTime) {
-      // 開始日時を構築（YYYYMMDDTHHMMSS形式）
-      const [year, month, day] = dateStr.split('T')[0].split('-');
+      const { year, month, day } = extractDate(item.date);
       const [hours, minutes] = item.startTime.split(':');
       const startDateStr = `${year}${month}${day}T${hours.padStart(2, '0')}${minutes.padStart(2, '0')}00`;
       
-      // 終了時刻を計算（開始時刻の1時間後をデフォルトとする）
+      // 終了時刻を計算
       let endDateStr = '';
       if (item.endDate) {
-        const [endYear, endMonth, endDay] = item.endDate.split('T')[0].split('-');
-        // 終了日の23:59とする
-        endDateStr = `${endYear}${endMonth}${endDay}T235900`;
+        const endDate = extractDate(item.endDate);
+        endDateStr = `${endDate.year}${endDate.month}${endDate.day}T235900`;
       } else {
-        // 開始時刻から1時間後
+        // 開始時刻から2時間後をデフォルトとする
         const startHour = parseInt(hours);
-        const endHour = startHour + 1;
+        const endHour = startHour + 2;
         endDateStr = `${year}${month}${day}T${endHour.toString().padStart(2, '0')}${minutes.padStart(2, '0')}00`;
       }
       
       dateString = `${startDateStr}/${endDateStr}`;
     } else {
       // 終日イベントの場合（日付のみ、YYYYMMDD形式）
-      const [year, month, day] = dateStr.split('T')[0].split('-');
+      const { year, month, day } = extractDate(item.date);
       const dateOnly = `${year}${month}${day}`;
       
       if (item.endDate) {
-        const endDate = new Date(item.endDate);
-        endDate.setDate(endDate.getDate() + 1); // Googleカレンダーは終日イベントの終了日を+1日する必要がある
-        const endYear = endDate.getFullYear();
-        const endMonth = (endDate.getMonth() + 1).toString().padStart(2, '0');
-        const endDay = endDate.getDate().toString().padStart(2, '0');
-        const endDateOnly = `${endYear}${endMonth}${endDay}`;
+        const endDate = extractDate(item.endDate);
+        // Googleカレンダーは終日イベントの終了日を+1日する必要がある
+        const endDateObj = new Date(`${endDate.year}-${endDate.month}-${endDate.day}`);
+        endDateObj.setDate(endDateObj.getDate() + 1);
+        const nextYear = endDateObj.getFullYear();
+        const nextMonth = (endDateObj.getMonth() + 1).toString().padStart(2, '0');
+        const nextDay = endDateObj.getDate().toString().padStart(2, '0');
+        const endDateOnly = `${nextYear}${nextMonth}${nextDay}`;
         dateString = `${dateOnly}/${endDateOnly}`;
       } else {
         // 終了日がない場合は開始日の翌日を終了日とする
-        const nextDate = new Date(dateStr);
-        nextDate.setDate(nextDate.getDate() + 1);
-        const nextYear = nextDate.getFullYear();
-        const nextMonth = (nextDate.getMonth() + 1).toString().padStart(2, '0');
-        const nextDay = nextDate.getDate().toString().padStart(2, '0');
+        const dateObj = new Date(`${year}-${month}-${day}`);
+        dateObj.setDate(dateObj.getDate() + 1);
+        const nextYear = dateObj.getFullYear();
+        const nextMonth = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+        const nextDay = dateObj.getDate().toString().padStart(2, '0');
         const nextDateOnly = `${nextYear}${nextMonth}${nextDay}`;
         dateString = `${dateOnly}/${nextDateOnly}`;
       }
