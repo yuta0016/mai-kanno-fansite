@@ -272,9 +272,10 @@ export default async function HomePage() {
             {latestWorks.length > 0 ? (
               <div className="space-y-4">
                 {latestWorks.map((work, index) => (
-                  <div
+                  <Link
                     key={`${work.id}-${index}`}
-                    className="border-l-4 border-pink-300 pl-4 py-3 hover:bg-gray-50 transition-colors"
+                    href={`/works#${work.id}`}
+                    className="block border-l-4 border-pink-300 pl-4 py-3 hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-2 sm:gap-3">
                       <span className="text-sm font-medium text-gray-500 sm:min-w-[60px]">
@@ -290,7 +291,7 @@ export default async function HomePage() {
                         {work.roleName}
                       </span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (
