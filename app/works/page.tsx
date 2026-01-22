@@ -43,6 +43,27 @@ export default function WorksPage() {
     loadWorks();
   }, []);
 
+  // ハッシュナビゲーション（ページ読み込み後にハッシュがある場合、該当箇所へスクロール）
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.hash) {
+        const id = window.location.hash.substring(1);
+        setTimeout(() => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.add('ring-4', 'ring-pink-300');
+            setTimeout(() => {
+              element.classList.remove('ring-4', 'ring-pink-300');
+            }, 2000);
+          }
+        }, 100);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }
+  }, [works]);
+
   // 作品種別の順序を定義
   const workTypeOrder: ('アニメ' | 'ゲーム' | '吹き替え' | 'CM・ナレーション' | 'CDドラマ' | 'ラジオ' | '舞台' | '映画' | 'ドラマ' | 'ボイスコミック' | 'その他')[] = [
     'アニメ',
@@ -262,6 +283,7 @@ export default function WorksPage() {
                     {worksInType.map((work, index) => (
                       <div
                         key={`${work.id}-${index}`}
+                        id={work.id}
                         className="border-l-4 border-pink-200 pl-4 py-2 hover:bg-gray-50 transition-colors"
                       >
                         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-2 sm:gap-3">
@@ -310,6 +332,7 @@ export default function WorksPage() {
               {filteredWorks.map((work, index) => (
                 <div
                   key={`${work.id}-${index}`}
+                  id={work.id}
                   className="border-l-4 border-pink-200 pl-4 py-2 hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-baseline gap-2 sm:gap-3">
