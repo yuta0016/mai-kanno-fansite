@@ -169,25 +169,53 @@ export default function EventsPage() {
   const generateGoogleCalendarUrl = (item: UnifiedItem) => {
     const title = encodeURIComponent(item.title);
     
-    // 開始日時を取得
-    const startDate = new Date(item.date);
+    // 日付文字列をJSTとして解釈
+    const dateStr = item.date;
     let dateString = '';
     
     // 時間情報がある場合
     if (item.startTime) {
+      // 開始日時を構築（YYYYMMDDTHHMMSS形式）
+      const [year, month, day] = dateStr.split('T')[0].split('-');
       const [hours, minutes] = item.startTime.split(':');
-      startDate.setHours(parseInt(hours), parseInt(minutes), 0);
-      dateString = startDate.toISOString().replace(/-|:|\.\d+/g, '');
+      const startDateStr = `${year}${month}${day}T${hours.padStart(2, '0')}${minutes.padStart(2, '0')}00`;
+      
+      // 終了時刻を計算（開始時刻の1時間後をデフォルトとする）
+      let endDateStr = '';
+      if (item.endDate) {
+        const [endYear, endMonth, endDay] = item.endDate.split('T')[0].split('-');
+        // 終了日の23:59とする
+        endDateStr = `${endYear}${endMonth}${endDay}T235900`;
+      } else {
+        // 開始時刻から1時間後
+        const startHour = parseInt(hours);
+        const endHour = startHour + 1;
+        endDateStr = `${year}${month}${day}T${endHour.toString().padStart(2, '0')}${minutes.padStart(2, '0')}00`;
+      }
+      
+      dateString = `${startDateStr}/${endDateStr}`;
     } else {
-      // 終日イベントの場合
-      const dateOnly = startDate.toISOString().split('T')[0].replace(/-/g, '');
+      // 終日イベントの場合（日付のみ、YYYYMMDD形式）
+      const [year, month, day] = dateStr.split('T')[0].split('-');
+      const dateOnly = `${year}${month}${day}`;
+      
       if (item.endDate) {
         const endDate = new Date(item.endDate);
         endDate.setDate(endDate.getDate() + 1); // Googleカレンダーは終日イベントの終了日を+1日する必要がある
-        const endDateOnly = endDate.toISOString().split('T')[0].replace(/-/g, '');
+        const endYear = endDate.getFullYear();
+        const endMonth = (endDate.getMonth() + 1).toString().padStart(2, '0');
+        const endDay = endDate.getDate().toString().padStart(2, '0');
+        const endDateOnly = `${endYear}${endMonth}${endDay}`;
         dateString = `${dateOnly}/${endDateOnly}`;
       } else {
-        dateString = `${dateOnly}/${dateOnly}`;
+        // 終了日がない場合は開始日の翌日を終了日とする
+        const nextDate = new Date(dateStr);
+        nextDate.setDate(nextDate.getDate() + 1);
+        const nextYear = nextDate.getFullYear();
+        const nextMonth = (nextDate.getMonth() + 1).toString().padStart(2, '0');
+        const nextDay = nextDate.getDate().toString().padStart(2, '0');
+        const nextDateOnly = `${nextYear}${nextMonth}${nextDay}`;
+        dateString = `${dateOnly}/${nextDateOnly}`;
       }
     }
     
@@ -204,7 +232,7 @@ export default function EventsPage() {
     const detailsEncoded = encodeURIComponent(details);
     const location = encodeURIComponent(item.venue || item.platform || '');
     
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateString}&details=${detailsEncoded}&location=${location}`;
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateString}&details=${detailsEncoded}&location=${location}&ctz=Asia/Tokyo`;
   };
 
   if (loading) {
