@@ -169,17 +169,13 @@ export default function EventsPage() {
   const generateGoogleCalendarUrl = (item: UnifiedItem) => {
     const title = encodeURIComponent(item.title);
     
-    // 日付文字列から直接YYYYMMDDを抽出（タイムゾーン変換を避ける）
-    // item.dateは "YYYY-MM-DD" または "YYYY-MM-DDTHH:mm:ss" 形式
-    const extractDate = (dateStr: string): { year: string; month: string; day: string } => {
-      const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
-      if (!match) {
-        throw new Error(`Invalid date format: ${dateStr}`);
-      }
+    // DateオブジェクトでJST時刻として日付を取得（ブラウザのタイムゾーンで解釈）
+    const getDateComponents = (dateStr: string): { year: string; month: string; day: string } => {
+      const date = new Date(dateStr);
       return {
-        year: match[1],
-        month: match[2],
-        day: match[3],
+        year: date.getFullYear().toString(),
+        month: (date.getMonth() + 1).toString().padStart(2, '0'),
+        day: date.getDate().toString().padStart(2, '0'),
       };
     };
     
@@ -216,14 +212,14 @@ export default function EventsPage() {
     
     // 時間情報がある場合
     if (item.startTime) {
-      const { year, month, day } = extractDate(item.date);
+      const { year, month, day } = getDateComponents(item.date);
       const [hours, minutes] = item.startTime.split(':');
       const startDateStr = `${year}${month}${day}T${hours.padStart(2, '0')}${minutes.padStart(2, '0')}00`;
       
       // 終了時刻を計算
       let endDateStr = '';
       if (item.endDate) {
-        const endDate = extractDate(item.endDate);
+        const endDate = getDateComponents(item.endDate);
         endDateStr = `${endDate.year}${endDate.month}${endDate.day}T235900`;
       } else {
         // 開始時刻から2時間後をデフォルトとする
@@ -235,11 +231,11 @@ export default function EventsPage() {
       dateString = `${startDateStr}/${endDateStr}`;
     } else {
       // 終日イベントの場合（日付のみ、YYYYMMDD形式）
-      const { year, month, day } = extractDate(item.date);
+      const { year, month, day } = getDateComponents(item.date);
       const dateOnly = `${year}${month}${day}`;
       
       if (item.endDate) {
-        const endDate = extractDate(item.endDate);
+        const endDate = getDateComponents(item.endDate);
         // Googleカレンダーは終日イベントの終了日を+1日する必要がある
         const nextDate = addOneDay(endDate.year, endDate.month, endDate.day);
         const endDateOnly = `${nextDate.year}${nextDate.month}${nextDate.day}`;
