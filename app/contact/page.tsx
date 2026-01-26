@@ -1,9 +1,13 @@
 import Link from 'next/link';
+import Breadcrumb from '@/components/Breadcrumb';
 
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-12">
       <div className="max-w-4xl mx-auto px-4">
+        {/* パンくずリスト */}
+        <Breadcrumb items={[{ label: 'お問い合わせ' }]} />
+        
         {/* ヘッダー */}
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">

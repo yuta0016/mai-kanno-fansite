@@ -3,6 +3,7 @@
 import { Event } from '@/lib/microcms';
 import Link from 'next/link';
 import { useEffect, useState, useMemo } from 'react';
+import Breadcrumb from '@/components/Breadcrumb';
 
 type UnifiedItem = {
   id: string;
@@ -275,9 +276,12 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-12">
+        {/* パンくずリスト */}
+        <Breadcrumb items={[{ label: 'イベント・スケジュール' }]} />
+        
         <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            イベント・スケジュール
+            菅野真衣 イベント・スケジュール
           </h1>
           <p className="text-gray-600">
             出演イベント、ラジオ、生配信などのスケジュール情報

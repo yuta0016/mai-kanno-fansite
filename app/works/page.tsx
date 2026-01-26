@@ -3,6 +3,7 @@
 import { Work } from '@/lib/microcms';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import Breadcrumb from '@/components/Breadcrumb';
 
 // メタデータはlayout.tsxのtemplateで設定されます
 // ページタイトルは動的に設定
@@ -122,10 +123,13 @@ export default function WorksPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-12">
+        {/* パンくずリスト */}
+        <Breadcrumb items={[{ label: '出演作品' }]} />
+        
         {/* ヘッダー */}
         <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            出演作品一覧
+            菅野真衣 出演作品一覧
           </h1>
           <p className="text-gray-600">
             菅野真衣さんの出演作品をご紹介します
