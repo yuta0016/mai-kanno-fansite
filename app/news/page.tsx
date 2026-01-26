@@ -68,8 +68,6 @@ export default async function NewsPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             菅野真衣 ニュース・更新履歴
           </h1>
-            更新履歴
-          </h1>
           <p className="text-gray-600">
             サイトの更新情報・お知らせ
           </p>
