@@ -103,17 +103,24 @@ export default async function HomePage() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: '菅野真衣非公式ファンサイト',
+    alternateName: ['菅野真衣ファンサイト', '菅野真衣'],
     url: 'https://mai-kanno-fansite.net',
     description: '声優・俳優 菅野真衣さんの非公式ファンサイト。出演作品、イベント情報、プロフィールなどを掲載しています。',
     inLanguage: 'ja-JP',
     about: {
       '@type': 'Person',
       name: '菅野真衣',
+      alternateName: ['かんの まい', 'Mai Kanno'],
       jobTitle: ['声優', '俳優'],
       sameAs: [
         'https://twitter.com/may_0324',
         'https://www.instagram.com/mai_kanno_/',
       ],
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: '菅野真衣非公式ファンサイト',
+      url: 'https://mai-kanno-fansite.net',
     },
   };
 
