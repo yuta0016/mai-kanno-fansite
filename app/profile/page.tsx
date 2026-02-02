@@ -67,7 +67,7 @@ export default function ProfilePage() {
                 <h3 className="text-sm font-semibold text-gray-500 mb-2">経歴</h3>
                 <div className="text-gray-900 space-y-2">
                   <p>平成26年：劇団日本児童 退団</p>
-                  <p>平成27年：マウスプロモーション附属俳優養成所 入所</p>
+                  <p>平成29年：マウスプロモーション附属俳優養成所 入所</p>
                   <p>平成31年：マウスプロモーション 所属</p>
                 </div>
               </div>
