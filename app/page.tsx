@@ -26,24 +26,19 @@ async function getUpcomingItems(): Promise<Event[]> {
     const jstNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
     // 今日の日付の0時0分0秒を取得（当日終了まで表示するため）
     const today = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate());
-    // microCMSのフィルタ用に今日の日付をISO文字列に変換（UTC基準で前日15:00）
-    const todayForFilter = today.toISOString();
+    // microCMSのフィルタ用に今日の日付を取得（UTCでは前日15時になる）
+    const filterDate = today.toISOString().split('T')[0];
     
     const eventsData = await client.get<MicroCMSListResponse<Event>>({
       endpoint: 'events',
       queries: {
         orders: 'eventDate',
-        filters: `eventDate[greater_than_or_equals]${todayForFilter}`,
+        filters: `eventDate[greater_than]${filterDate}`,
         limit: 10,
       },
     });
     
     const events = eventsData.contents || [];
-    
-    console.log('=== Homepage Event Debug ===');
-    console.log('Today (JST):', today.toISOString());
-    console.log('Filter date:', todayForFilter);
-    console.log('Events from microCMS (filtered):', events.length);
     
     // 既にmicroCMSでフィルタリング済みなので、ソートして最大3件取得
     const upcomingEvents = events.sort((a: Event, b: Event) => {
@@ -56,9 +51,6 @@ async function getUpcomingItems(): Promise<Event[]> {
       const timeB = b.startTime || '99:99';
       return timeA.localeCompare(timeB);
     }).slice(0, 3);
-    
-    console.log('Upcoming events count:', upcomingEvents.length);
-    console.log('=========================');
     
     return upcomingEvents;
   } catch (error) {
