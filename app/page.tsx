@@ -37,6 +37,10 @@ async function getUpcomingItems(): Promise<Event[]> {
     
     const events = eventsData.contents || [];
     
+    console.log('=== Homepage Event Debug ===');
+    console.log('Today (JST):', today.toISOString());
+    console.log('Total events from microCMS:', events.length);
+    
     const upcomingEvents = events.filter((event: Event) => {
       // microCMSの日付を日本時間として解釈
       const eventDate = new Date(event.eventDate);
@@ -45,8 +49,11 @@ async function getUpcomingItems(): Promise<Event[]> {
       // イベント日（時刻を除く）
       const eventDay = new Date(jstEventDate.getFullYear(), jstEventDate.getMonth(), jstEventDate.getDate());
       
+      const isUpcoming = eventDay >= today;
+      console.log(`Event: ${event.eventName}, Date: ${event.eventDate}, EventDay: ${eventDay.toISOString()}, IsUpcoming: ${isUpcoming}`);
+      
       // 今日以降のイベントを表示（ステータスに関係なく）
-      return eventDay >= today;
+      return isUpcoming;
     }).sort((a: Event, b: Event) => {
       const dateA = new Date(a.eventDate);
       const dateB = new Date(b.eventDate);
@@ -57,6 +64,9 @@ async function getUpcomingItems(): Promise<Event[]> {
       const timeB = b.startTime || '99:99';
       return timeA.localeCompare(timeB);
     }).slice(0, 3);
+    
+    console.log('Upcoming events count:', upcomingEvents.length);
+    console.log('=========================');
     
     return upcomingEvents;
   } catch (error) {
