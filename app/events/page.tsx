@@ -145,6 +145,11 @@ export default function EventsPage() {
     setCurrentPage(1);
   }, [selectedStatus, selectedType, selectedYear, searchQuery, itemsPerPage]);
 
+  // ページが変更されたらトップにスクロール
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
+
   // ページネーション
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -457,7 +462,7 @@ export default function EventsPage() {
                 id="itemsPerPage"
                 value={itemsPerPage}
                 onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
               >
                 <option value={10}>10件</option>
                 <option value={25}>25件</option>
