@@ -29,6 +29,12 @@ async function getUpcomingItems(): Promise<Event[]> {
     // microCMSのフィルタ用にISO形式で取得（UTCになるので前日の15:00）
     const filterDate = today.toISOString();
     
+    console.log('=== Homepage Event Filter Debug ===');
+    console.log('Now:', now.toISOString());
+    console.log('JST Now:', jstNow.toISOString());
+    console.log('Today (JST 0:00):', today.toISOString());
+    console.log('Filter date:', filterDate);
+    
     const eventsData = await client.get<MicroCMSListResponse<Event>>({
       endpoint: 'events',
       queries: {
@@ -39,6 +45,11 @@ async function getUpcomingItems(): Promise<Event[]> {
     });
     
     const events = eventsData.contents || [];
+    
+    console.log('Events from microCMS:', events.length);
+    events.forEach(event => {
+      console.log(`  - ${event.eventName}: ${event.eventDate}`);
+    });
     
     // 既にmicroCMSでフィルタリング済みなので、ソートして最大3件取得
     const upcomingEvents = events.sort((a: Event, b: Event) => {
@@ -51,6 +62,9 @@ async function getUpcomingItems(): Promise<Event[]> {
       const timeB = b.startTime || '99:99';
       return timeA.localeCompare(timeB);
     }).slice(0, 3);
+    
+    console.log('Upcoming events count:', upcomingEvents.length);
+    console.log('===================================');
     
     return upcomingEvents;
   } catch (error) {
