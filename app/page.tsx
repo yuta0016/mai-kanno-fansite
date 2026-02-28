@@ -26,50 +26,25 @@ async function getUpcomingItems(): Promise<Event[]> {
     const jstNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
     // 今日の日付の0時0分0秒を取得（当日終了まで表示するため）
     const today = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate());
-    // microCMSのフィルタ用にISO形式で取得（UTCになるので前日の15:00）
-    const filterDate = today.toISOString();
     
-    console.log('=== Homepage Event Filter Debug ===');
-    console.log('Now:', now.toISOString());
-    console.log('JST Now:', jstNow.toISOString());
-    console.log('Today (JST 0:00):', today.toISOString());
-    console.log('Filter date:', filterDate);
-    
-    // まず全イベントを取得して確認
-    const allEventsData = await client.get<MicroCMSListResponse<Event>>({
-      endpoint: 'events',
-      queries: {
-        orders: '-eventDate', // 新しい順に変更
-        limit: 100,
-      },
-    });
-    
-    console.log('All events in microCMS:', allEventsData.contents?.length || 0);
-    if (allEventsData.contents && allEventsData.contents.length > 0) {
-      console.log('Latest 5 events:');
-      allEventsData.contents.slice(0, 5).forEach(event => {
-        console.log(`  - ${event.eventName}: ${event.eventDate}`);
-      });
-    }
-    
+    // 全イベントを取得して、コード側でフィルタリング
     const eventsData = await client.get<MicroCMSListResponse<Event>>({
       endpoint: 'events',
       queries: {
-        orders: 'eventDate', // フィルタ後は古い順（直近のものが先に来るように）
-        filters: `eventDate[greater_than_or_equals]${filterDate}`,
-        limit: 10,
+        orders: '-eventDate', // 新しい順
+        limit: 100, // 最新100件を取得
       },
     });
     
     const events = eventsData.contents || [];
     
-    console.log('Events from microCMS:', events.length);
-    events.forEach(event => {
-      console.log(`  - ${event.eventName}: ${event.eventDate}`);
-    });
-    
-    // 既にmicroCMSでフィルタリング済みなので、ソートして最大3件取得
-    const upcomingEvents = events.sort((a: Event, b: Event) => {
+    // 今日以降のイベントをフィルタ
+    const upcomingEvents = events.filter(event => {
+      const eventDate = new Date(event.eventDate);
+      const jstEventDate = new Date(eventDate.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+      const eventDay = new Date(jstEventDate.getFullYear(), jstEventDate.getMonth(), jstEventDate.getDate());
+      return eventDay >= today;
+    }).sort((a: Event, b: Event) => {
       const dateA = new Date(a.eventDate);
       const dateB = new Date(b.eventDate);
       if (dateA.getTime() !== dateB.getTime()) {
@@ -79,9 +54,6 @@ async function getUpcomingItems(): Promise<Event[]> {
       const timeB = b.startTime || '99:99';
       return timeA.localeCompare(timeB);
     }).slice(0, 3);
-    
-    console.log('Upcoming events count:', upcomingEvents.length);
-    console.log('===================================');
     
     return upcomingEvents;
   } catch (error) {
