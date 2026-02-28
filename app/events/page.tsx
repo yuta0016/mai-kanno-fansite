@@ -29,6 +29,7 @@ export default function EventsPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('すべて');
   const [selectedType, setSelectedType] = useState<string>('すべて');
   const [selectedYear, setSelectedYear] = useState<string>('すべて');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -123,7 +124,18 @@ export default function EventsPage() {
     const typeMatch = selectedType === 'すべて' || itemType === selectedType;
     const itemYear = new Date(item.date).getFullYear().toString();
     const yearMatch = selectedYear === 'すべて' || itemYear === selectedYear;
-    return statusMatch && typeMatch && yearMatch;
+    
+    // 検索クエリによるフィルタリング
+    const searchMatch = searchQuery === '' || [
+      item.title,
+      item.venue,
+      item.platform,
+      item.performer,
+      item.description,
+      itemType
+    ].some(field => field?.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return statusMatch && typeMatch && yearMatch && searchMatch;
   });
 
   const formatDate = (dateString: string) => {
@@ -288,6 +300,42 @@ export default function EventsPage() {
           </p>
         </header>
 
+        {/* 検索ボックス */}
+        <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="イベント名、会場、出演者などで検索..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            />
+            <svg
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -379,6 +427,11 @@ export default function EventsPage() {
           </div>
 
           <div className="mt-4 text-sm text-gray-600">
+            {searchQuery && (
+              <span className="mr-2">
+                「<span className="font-semibold text-pink-600">{searchQuery}</span>」の検索結果:
+              </span>
+            )}
             {filteredItems.length}件
           </div>
         </div>
@@ -386,7 +439,15 @@ export default function EventsPage() {
         <div className="space-y-6">
           {filteredItems.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-              <p className="text-gray-500">該当する情報がありません</p>
+              <p className="text-gray-500 mb-2">該当する情報がありません</p>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="text-pink-500 hover:text-pink-600 text-sm font-medium"
+                >
+                  検索をクリア
+                </button>
+              )}
             </div>
           ) : (
             filteredItems.map((item) => (
