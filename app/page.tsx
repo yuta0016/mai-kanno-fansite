@@ -35,6 +35,23 @@ async function getUpcomingItems(): Promise<Event[]> {
     console.log('Today (JST 0:00):', today.toISOString());
     console.log('Filter date:', filterDate);
     
+    // まず全イベントを取得して確認
+    const allEventsData = await client.get<MicroCMSListResponse<Event>>({
+      endpoint: 'events',
+      queries: {
+        orders: 'eventDate',
+        limit: 100,
+      },
+    });
+    
+    console.log('All events in microCMS:', allEventsData.contents?.length || 0);
+    if (allEventsData.contents && allEventsData.contents.length > 0) {
+      console.log('Latest 5 events:');
+      allEventsData.contents.slice(0, 5).forEach(event => {
+        console.log(`  - ${event.eventName}: ${event.eventDate}`);
+      });
+    }
+    
     const eventsData = await client.get<MicroCMSListResponse<Event>>({
       endpoint: 'events',
       queries: {
