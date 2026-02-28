@@ -30,6 +30,8 @@ export default function EventsPage() {
   const [selectedType, setSelectedType] = useState<string>('すべて');
   const [selectedYear, setSelectedYear] = useState<string>('すべて');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [itemsPerPage, setItemsPerPage] = useState<number>(25);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -137,6 +139,17 @@ export default function EventsPage() {
     
     return statusMatch && typeMatch && yearMatch && searchMatch;
   });
+
+  // フィルタ条件が変更されたらページを1に戻す
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedStatus, selectedType, selectedYear, searchQuery, itemsPerPage]);
+
+  // ページネーション
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = filteredItems.slice(startIndex, endIndex);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -426,13 +439,31 @@ export default function EventsPage() {
             </div>
           </div>
 
-          <div className="mt-4 text-sm text-gray-600">
-            {searchQuery && (
-              <span className="mr-2">
-                「<span className="font-semibold text-pink-600">{searchQuery}</span>」の検索結果:
-              </span>
-            )}
-            {filteredItems.length}件
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-sm text-gray-600">
+              {searchQuery && (
+                <span className="mr-2">
+                  「<span className="font-semibold text-pink-600">{searchQuery}</span>」の検索結果:
+                </span>
+              )}
+              全{filteredItems.length}件中 {startIndex + 1}〜{Math.min(endIndex, filteredItems.length)}件を表示
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <label htmlFor="itemsPerPage" className="text-sm text-gray-600">
+                表示件数:
+              </label>
+              <select
+                id="itemsPerPage"
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              >
+                <option value={10}>10件</option>
+                <option value={25}>25件</option>
+                <option value={50}>50件</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -450,7 +481,7 @@ export default function EventsPage() {
               )}
             </div>
           ) : (
-            filteredItems.map((item) => (
+            paginatedItems.map((item) => (
               <div
                 key={item.id}
                 id={item.id}
@@ -606,6 +637,63 @@ export default function EventsPage() {
             ))
           )}
         </div>
+
+        {/* ページネーション */}
+        {filteredItems.length > 0 && totalPages > 1 && (
+          <div className="mt-8 flex items-center justify-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                currentPage === 1
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+              }`}
+            >
+              前へ
+            </button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                // 最初、最後、現在のページ周辺のみ表示
+                if (
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        currentPage === page
+                          ? 'bg-pink-500 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                } else if (page === currentPage - 2 || page === currentPage + 2) {
+                  return <span key={page} className="px-2 text-gray-400">...</span>;
+                }
+                return null;
+              })}
+            </div>
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                currentPage === totalPages
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+              }`}
+            >
+              次へ
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
