@@ -13,6 +13,8 @@ export default function WorksPage() {
   const [selectedCategory, setSelectedCategory] = useState<'すべて' | 'アニメ' | 'ゲーム' | '吹き替え' | 'CM・ナレーション' | 'CDドラマ' | 'ラジオ' | '舞台' | '映画' | 'ドラマ' | 'ボイスコミック' | 'その他'>('すべて');
   const [selectedYear, setSelectedYear] = useState<string>('すべて');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [itemsPerPage, setItemsPerPage] = useState<number>(25);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -101,8 +103,24 @@ export default function WorksPage() {
     return categoryMatch && yearMatch && searchMatch;
   });
 
+  // フィルタ条件が変更されたらページを1に戻す
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedYear, searchQuery, itemsPerPage]);
+
+  // ページが変更されたらトップにスクロール
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
+
+  // ページネーション
+  const totalPages = Math.ceil(filteredWorks.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedWorks = filteredWorks.slice(startIndex, endIndex);
+
   // 作品種別ごとにグループ化
-  const groupedWorks = filteredWorks.reduce((acc, work) => {
+  const groupedWorks = paginatedWorks.reduce((acc, work) => {
     // workTypeは配列なので、最初の要素を使用
     const type = work.workType[0];
     if (!acc[type]) {
@@ -240,6 +258,33 @@ export default function WorksPage() {
               </button>
             ))}
           </div>
+
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-sm text-gray-600">
+              {searchQuery && (
+                <span className="mr-2">
+                  「<span className="font-semibold text-pink-600">{searchQuery}</span>」の検索結果:
+                </span>
+              )}
+              全{filteredWorks.length}件中 {startIndex + 1}〜{Math.min(endIndex, filteredWorks.length)}件を表示
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <label htmlFor="itemsPerPage" className="text-sm text-gray-600">
+                表示件数:
+              </label>
+              <select
+                id="itemsPerPage"
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+              >
+                <option value={10}>10件</option>
+                <option value={25}>25件</option>
+                <option value={50}>50件</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* 選択中のカテゴリーと件数表示 */}
@@ -371,6 +416,63 @@ export default function WorksPage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ページネーション */}
+        {filteredWorks.length > 0 && totalPages > 1 && (
+          <div className="mt-8 flex items-center justify-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                currentPage === 1
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+              }`}
+            >
+              前へ
+            </button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                // 最初、最後、現在のページ周辺のみ表示
+                if (
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        currentPage === page
+                          ? 'bg-pink-500 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                } else if (page === currentPage - 2 || page === currentPage + 2) {
+                  return <span key={page} className="px-2 text-gray-400">...</span>;
+                }
+                return null;
+              })}
+            </div>
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                currentPage === totalPages
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+              }`}
+            >
+              次へ
+            </button>
           </div>
         )}
 
