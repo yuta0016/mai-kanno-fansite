@@ -39,7 +39,7 @@ async function getUpcomingItems(): Promise<Event[]> {
     const allEventsData = await client.get<MicroCMSListResponse<Event>>({
       endpoint: 'events',
       queries: {
-        orders: 'eventDate',
+        orders: '-eventDate', // 新しい順に変更
         limit: 100,
       },
     });
@@ -55,7 +55,7 @@ async function getUpcomingItems(): Promise<Event[]> {
     const eventsData = await client.get<MicroCMSListResponse<Event>>({
       endpoint: 'events',
       queries: {
-        orders: 'eventDate',
+        orders: 'eventDate', // フィルタ後は古い順（直近のものが先に来るように）
         filters: `eventDate[greater_than_or_equals]${filterDate}`,
         limit: 10,
       },
