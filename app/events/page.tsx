@@ -160,7 +160,7 @@ export default function EventsPage() {
     if (status === '配信中') {
       return 'bg-yellow-100 text-yellow-800';
     }
-    if (status === '中止') {
+    if (['中止', '出演キャンセル'].includes(status)) {
       return 'bg-red-100 text-red-800';
     }
     return 'bg-gray-100 text-gray-800';
