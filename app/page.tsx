@@ -33,7 +33,7 @@ async function getUpcomingItems(): Promise<Event[]> {
       endpoint: 'events',
       queries: {
         orders: 'eventDate',
-        filters: `eventDate[greater_than]${filterDate}`,
+        filters: `eventDate[greater_than_or_equals]${filterDate}`,
         limit: 10,
       },
     });
