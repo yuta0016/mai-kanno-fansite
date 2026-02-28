@@ -26,8 +26,8 @@ async function getUpcomingItems(): Promise<Event[]> {
     const jstNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
     // 今日の日付の0時0分0秒を取得（当日終了まで表示するため）
     const today = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate());
-    // microCMSのフィルタ用に今日の日付を取得（UTCでは前日15時になる）
-    const filterDate = today.toISOString().split('T')[0];
+    // microCMSのフィルタ用にISO形式で取得（UTCになるので前日の15:00）
+    const filterDate = today.toISOString();
     
     const eventsData = await client.get<MicroCMSListResponse<Event>>({
       endpoint: 'events',
