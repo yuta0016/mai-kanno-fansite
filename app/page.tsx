@@ -3,6 +3,32 @@ import Link from 'next/link';
 
 export const revalidate = 60;
 
+// ▼ ここに代表作品として表示したいコンテンツIDを記入してください
+const FEATURED_WORK_IDS: string[] = [
+  '4t6xlmveb1x',
+  'uryt7m-9jnq0',
+  '9fwepl0mbp87'
+];
+
+async function getFeaturedWorks(ids: string[]): Promise<Work[]> {
+  if (ids.length === 0) return [];
+  try {
+    const data = await client.get<MicroCMSListResponse<Work>>({
+      endpoint: 'works',
+      queries: {
+        ids: ids.join(','),
+        limit: ids.length,
+      },
+    });
+    // 指定した順番通りに並び替え
+    const worksMap = new Map(data.contents.map(w => [w.id, w]));
+    return ids.map(id => worksMap.get(id)).filter((w): w is Work => w !== undefined);
+  } catch (error) {
+    console.error('Error fetching featured works:', error);
+    return [];
+  }
+}
+
 async function getLatestWorks(): Promise<Work[]> {
   try {
     const data = await client.get<MicroCMSListResponse<Work>>({
@@ -63,8 +89,11 @@ async function getUpcomingItems(): Promise<Event[]> {
 }
 
 export default async function HomePage() {
-  const latestWorks = await getLatestWorks();
-  const upcomingEvents = await getUpcomingItems();
+  const [latestWorks, upcomingEvents, featuredWorks] = await Promise.all([
+    getLatestWorks(),
+    getUpcomingItems(),
+    getFeaturedWorks(FEATURED_WORK_IDS),
+  ]);
 
   // 日付をフォーマット
   const formatDate = (dateString: string) => {
@@ -260,6 +289,49 @@ export default async function HomePage() {
                   className="inline-block bg-white text-pink-600 hover:bg-pink-50 font-semibold px-8 py-3 rounded-full transition-colors"
                 >
                   すべてのイベント・スケジュールを見る →
+                </Link>
+              </div>
+            </section>
+          )}
+
+          {/* 代表作品 */}
+          {featuredWorks.length > 0 && (
+            <section className="bg-white rounded-lg shadow-md p-8">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center border-b-4 border-pink-400 pb-3">
+                Featured Works
+              </h2>
+              <p className="text-center text-gray-500 text-sm mb-6">代表作品</p>
+              <div className="grid sm:grid-cols-3 gap-6">
+                {featuredWorks.map((work) => (
+                  <Link
+                    key={work.id}
+                    href={`/works#${work.id}`}
+                    className="group border border-pink-100 rounded-lg p-5 hover:shadow-md hover:border-pink-300 transition-all text-center"
+                  >
+                    <div className="flex flex-wrap justify-center gap-1 mb-3">
+                      {work.workType.map((type) => (
+                        <span
+                          key={type}
+                          className="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded"
+                        >
+                          {type}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-pink-600 transition-colors">
+                      {work.title}
+                    </h3>
+                    <p className="text-sm text-pink-600 font-medium mb-1">{work.roleName}</p>
+                    <p className="text-xs text-gray-400">{work.releaseYear}年</p>
+                  </Link>
+                ))}
+              </div>
+              <div className="text-center mt-6">
+                <Link
+                  href="/works"
+                  className="inline-block bg-white hover:bg-gray-50 text-pink-600 font-semibold px-8 py-3 rounded-full border-2 border-pink-500 transition-colors"
+                >
+                  出演作品一覧を見る →
                 </Link>
               </div>
             </section>
