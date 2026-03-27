@@ -12,6 +12,7 @@ export default function Header() {
     { href: '/', label: 'ホーム' },
     { href: '/profile', label: 'プロフィール' },
     { href: '/works', label: '出演作品' },
+    { href: '/songs', label: '楽曲データベース' },
     { href: '/events', label: 'イベント・スケジュール' },
     { href: '/news', label: '更新履歴' },
     { href: '/contact', label: 'お問い合わせ' },

@@ -113,3 +113,27 @@ export interface Schedule {
   publishedAt: string;
   revisedAt: string;
 }
+
+// 楽曲の型定義
+export interface Song {
+  id: string;
+  title: string;
+  titleKana?: string;       // 読み仮名（五十音順ソート・グループ化用）
+  lyricist?: string;        // 作詞
+  composer?: string;        // 作曲
+  arranger?: string;        // 編曲
+  vocalist?: string;        // 歌
+  album?: string;           // 収録作品（CD・アルバム名）
+  usedInWork?: string;      // 使用作品（アニメ・ゲームタイトルなど）
+  usedAs?: string;          // 使用パート（OP/ED/挿入歌など）
+  releaseDate?: string;     // リリース日
+  appleMusicUrl?: string;   // Apple Musicリンク
+  spotifyUrl?: string;      // Spotifyリンク
+  youtubeMusicUrl?: string; // YouTube Musicリンク
+  amazonMusicUrl?: string;  // Amazon Musicリンク
+  lyricsUrl?: string;       // 歌詞サイトリンク
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  revisedAt: string;
+}
