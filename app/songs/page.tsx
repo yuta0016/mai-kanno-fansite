@@ -52,7 +52,7 @@ function formatDate(dateStr?: string): string {
 }
 
 const STREAMING_SERVICES: {
-  key: keyof Pick<Song, 'appleMusicUrl' | 'spotifyUrl' | 'youtubeMusicUrl' | 'amazonMusicUrl'>;
+  key: keyof Pick<Song, 'appleMusicUrl' | 'spotifyUrl' | 'youtubeMusicUrl' | 'amazonMusicUrl' | 'youtubeUrl'>;
   label: string;
   bgClass: string;
   icon: string;
@@ -61,6 +61,7 @@ const STREAMING_SERVICES: {
   { key: 'spotifyUrl', label: 'Spotify', bgClass: 'bg-green-500', icon: '🎧' },
   { key: 'youtubeMusicUrl', label: 'YouTube Music', bgClass: 'bg-red-600', icon: '▶' },
   { key: 'amazonMusicUrl', label: 'Amazon Music', bgClass: 'bg-sky-500', icon: '♪' },
+  { key: 'youtubeUrl', label: 'YouTube', bgClass: 'bg-red-500', icon: '▶' },
 ];
 
 // 個々の楽曲カード（展開/折りたたみ）

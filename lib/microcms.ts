@@ -131,6 +131,7 @@ export interface Song {
   spotifyUrl?: string;      // Spotifyリンク
   youtubeMusicUrl?: string; // YouTube Musicリンク
   amazonMusicUrl?: string;  // Amazon Musicリンク
+  youtubeUrl?: string;      // YouTubeリンク
   lyricsUrl?: string;       // 歌詞サイトリンク
   createdAt: string;
   updatedAt: string;
