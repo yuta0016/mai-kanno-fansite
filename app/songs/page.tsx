@@ -242,11 +242,11 @@ export default function SongsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white">
       <div className="max-w-5xl mx-auto px-4 py-12">
-        <Breadcrumb items={[{ label: '楽曲データベース', href: '/songs' }]} />
+        <Breadcrumb items={[{ label: '参加楽曲データベース', href: '/songs' }]} />
 
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-            楽曲データベース
+            参加楽曲データベース
           </h1>
           <p className="text-gray-500 text-sm">
             Song Database

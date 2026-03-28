@@ -383,7 +383,7 @@ export default async function HomePage() {
           </section>
 
           {/* ナビゲーション */}
-          <section className="grid md:grid-cols-4 gap-6">
+          <section className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
             <Link
               href="/profile"
               className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-center"
@@ -411,15 +411,28 @@ export default async function HomePage() {
             </Link>
 
             <Link
+              href="/songs"
+              className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-center"
+            >
+              <div className="text-4xl mb-3">🎵</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                参加楽曲
+              </h3>
+              <p className="text-sm text-gray-600">
+                楽曲データベース
+              </p>
+            </Link>
+
+            <Link
               href="/events"
               className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-center"
             >
               <div className="text-4xl mb-3">📅</div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">
-                イベント
+                イベント・スケジュール
               </h3>
               <p className="text-sm text-gray-600">
-                出演イベント情報
+                出演イベント・スケジュール情報
               </p>
             </Link>
 
