@@ -78,6 +78,20 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <head>
+        {/* WebSite 構造化データ（Googleのサイト名表示用） */}
+        <Script
+          id="json-ld-website"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "菅野真衣非公式ファンサイト",
+              "url": "https://mai-kanno-fansite.net",
+            }),
+          }}
+        />
         {/* Google Analytics */}
         <Script
           strategy="afterInteractive"
