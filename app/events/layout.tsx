@@ -10,10 +10,19 @@ export const metadata: Metadata = {
     title: 'イベント・スケジュール | 菅野真衣非公式ファンサイト',
     description: '菅野真衣さんのイベント情報、ラジオ出演、生配信などのスケジュール情報を掲載しています。',
     url: 'https://mai-kanno-fansite.net/events',
+    images: [
+      {
+        url: '/ogp.png',
+        width: 1200,
+        height: 630,
+        alt: '菅野真衣非公式ファンサイト',
+      },
+    ],
   },
   twitter: {
     title: 'イベント・スケジュール | 菅野真衣非公式ファンサイト',
     description: '菅野真衣さんのイベント情報、ラジオ出演、生配信などのスケジュール情報を掲載しています。',
+    images: ['/ogp.png'],
   },
 };
 
