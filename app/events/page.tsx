@@ -545,7 +545,11 @@ export default function EventsPage() {
 
                     {item.participationMethod && (
                       <div className="mb-3 text-gray-700">
-                        <span className="font-medium">参加方法:</span> {item.participationMethod}
+                        <span className="font-medium">参加方法:</span>{' '}
+                        <span
+                          className="prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={{ __html: item.participationMethod }}
+                        />
                       </div>
                     )}
 
