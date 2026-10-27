@@ -146,10 +146,8 @@ export interface MyMailArchive {
   content: string; // 放送内容紹介（リッチテキスト）
   corners: ('ふつうのおおたより' | 'まいふぇいばりっと' | 'あなたのまいにち☆' | 'この菅野真衣はノンフィクションであり…')[]; // やったコーナー
   broadcastType: 'ラジオ' | '生放送' | 'おまけ動画'; // 放送種別
-  broadcastUrls?: Array<{
-    platform: 'YouTube' | 'ニコニコ動画';
-    url: string;
-  }>; // 放送URL
+  broadcastUrlYouTube?: string; // YouTube放送URL
+  broadcastUrlNiconico?: string; // ニコニコ動画放送URL
   xUrl1?: string; // 関連X投稿URL1
   xUrl2?: string; // 関連X投稿URL2
   xUrl3?: string; // 関連X投稿URL3

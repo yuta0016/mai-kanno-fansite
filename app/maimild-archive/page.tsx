@@ -285,25 +285,40 @@ export default function MaimildArchivePage() {
                 )}
 
                 {/* 放送URL */}
-                {archive.broadcastUrls && archive.broadcastUrls.length > 0 && (
+                {(archive.broadcastUrlYouTube || archive.broadcastUrlNiconico) && (
                   <div className="mb-4">
                     <h4 className="text-sm font-semibold text-gray-700 mb-3">放送URL</h4>
                     <div className="space-y-2">
-                      {archive.broadcastUrls.map((item, index) => (
-                        <div key={index} className="flex items-center gap-2">
+                      {archive.broadcastUrlYouTube && (
+                        <div className="flex items-center gap-2">
                           <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-xs font-semibold rounded-full">
-                            {item.platform}
+                            YouTube
                           </span>
                           <a 
-                            href={item.url}
+                            href={archive.broadcastUrlYouTube}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-500 hover:underline break-all text-sm flex-1"
                           >
-                            {item.url}
+                            {archive.broadcastUrlYouTube}
                           </a>
                         </div>
-                      ))}
+                      )}
+                      {archive.broadcastUrlNiconico && (
+                        <div className="flex items-center gap-2">
+                          <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-xs font-semibold rounded-full">
+                            ニコニコ動画
+                          </span>
+                          <a 
+                            href={archive.broadcastUrlNiconico}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline break-all text-sm flex-1"
+                          >
+                            {archive.broadcastUrlNiconico}
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
