@@ -437,6 +437,19 @@ export default async function HomePage() {
             </Link>
 
             <Link
+              href="/maimild-archive"
+              className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-center"
+            >
+              <div className="text-4xl mb-3">📻</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                マイマイルド
+              </h3>
+              <p className="text-sm text-gray-600">
+                番組アーカイブ
+              </p>
+            </Link>
+
+            <Link
               href="/news"
               className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-center"
             >
