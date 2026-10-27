@@ -9,6 +9,7 @@ const CORNERS = [
   'まいふぇいばりっと',
   'あなたのまいにち☆',
   'この菅野真衣はノンフィクションであり…',
+  '言質Yes or No',
 ] as const;
 
 const BROADCAST_TYPES = ['ラジオ', '生放送', 'おまけ動画'] as const;

@@ -144,7 +144,7 @@ export interface MyMailArchive {
   id: string;
   broadcastDate: string; // 放送日時
   content: string; // 放送内容紹介（リッチテキスト）
-  corners: ('ふつうのおおたより' | 'まいふぇいばりっと' | 'あなたのまいにち☆' | 'この菅野真衣はノンフィクションであり…')[]; // やったコーナー
+  corners: ('ふつうのおおたより' | 'まいふぇいばりっと' | 'あなたのまいにち☆' | 'この菅野真衣はノンフィクションであり…' | '言質Yes or No')[]; // やったコーナー
   broadcastType: 'ラジオ' | '生放送' | 'おまけ動画'; // 放送種別
   broadcastUrlYouTube?: string; // YouTube放送URL
   broadcastUrlNiconico?: string; // ニコニコ動画放送URL
