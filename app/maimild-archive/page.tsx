@@ -284,6 +284,30 @@ export default function MaimildArchivePage() {
                   </div>
                 )}
 
+                {/* 放送URL */}
+                {archive.broadcastUrls && archive.broadcastUrls.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3">放送URL</h4>
+                    <div className="space-y-2">
+                      {archive.broadcastUrls.map((item, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-xs font-semibold rounded-full">
+                            {item.platform}
+                          </span>
+                          <a 
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline break-all text-sm flex-1"
+                          >
+                            {item.url}
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* 関連X投稿 */}
                 {archive.xUrls && archive.xUrls.length > 0 && (
                   <div className="mb-4">
