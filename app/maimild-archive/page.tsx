@@ -27,6 +27,11 @@ export default function MaimildArchivePage() {
       try {
         const res = await fetch('/api/maimild-archive');
         const data = await res.json();
+        
+        if (!res.ok) {
+          console.error('API Error:', data.error);
+        }
+        
         setArchives(data.archives || []);
       } catch (error) {
         console.error('Failed to fetch archives:', error);

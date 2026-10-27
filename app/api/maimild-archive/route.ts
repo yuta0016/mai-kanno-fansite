@@ -7,6 +7,8 @@ export const revalidate = 60; // 60秒ごとに再検証
 
 export async function GET() {
   try {
+    console.log('Fetching maimild_archive from microCMS...');
+    
     let allArchives: MyMailArchive[] = [];
     let offset = 0;
     const limit = 100;
@@ -22,6 +24,7 @@ export async function GET() {
         },
       });
 
+      console.log(`Fetched ${response.contents.length} archives (offset: ${offset})`);
       allArchives = [...allArchives, ...response.contents];
       
       if (response.contents.length < limit) {
@@ -30,6 +33,8 @@ export async function GET() {
         offset += limit;
       }
     }
+
+    console.log(`Total archives fetched: ${allArchives.length}`);
 
     // IDの重複を除去
     const uniqueArchives = Array.from(
@@ -43,7 +48,7 @@ export async function GET() {
   } catch (error) {
     console.error('Failed to fetch maimild archive:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch maimild archive' },
+      { error: `Failed to fetch maimild archive: ${error instanceof Error ? error.message : String(error)}` },
       { status: 500 }
     );
   }
