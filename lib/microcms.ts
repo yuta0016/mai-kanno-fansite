@@ -138,3 +138,20 @@ export interface Song {
   publishedAt: string;
   revisedAt: string;
 }
+
+// マイペースマイワールドアーカイブの型定義
+export interface MyMailArchive {
+  id: string;
+  broadcastDate: string; // 放送日時
+  content: string; // 放送内容紹介（リッチテキスト）
+  corners: ('ふつうのおおたより' | 'まいふぇいばりっと' | 'あなたのまいにち☆' | 'この菅野真衣はノンフィクションであり…')[]; // やったコーナー
+  broadcastType: 'ラジオ' | '生放送' | 'おまけ動画'; // 放送種別
+  xUrls?: Array<{
+    url: string;
+  }>; // 関連X投稿（最大3つ）
+  displayOrder?: number; // 表示順
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  revisedAt: string;
+}
