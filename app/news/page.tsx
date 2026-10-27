@@ -53,8 +53,21 @@ export default async function NewsPage() {
   }, {} as Record<string, News[]>);
 
   const yearMonths = Object.keys(groupedNews).sort((a, b) => {
-    // 降順にソート（新しい順）
-    return b.localeCompare(a);
+    // 年月を数値に変換して降順にソート（新しい順）
+    const aMatch = a.match(/(\d+)年(\d+)月/);
+    const bMatch = b.match(/(\d+)年(\d+)月/);
+    
+    if (!aMatch || !bMatch) return 0;
+    
+    const aYear = parseInt(aMatch[1]);
+    const aMonth = parseInt(aMatch[2]);
+    const bYear = parseInt(bMatch[1]);
+    const bMonth = parseInt(bMatch[2]);
+    
+    const aDate = aYear * 100 + aMonth;
+    const bDate = bYear * 100 + bMonth;
+    
+    return bDate - aDate; // 降順
   });
 
   return (
