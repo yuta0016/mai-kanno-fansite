@@ -14,7 +14,7 @@ export async function GET() {
 
     while (hasMore) {
       const response = await client.get({
-        endpoint: 'my_mail_archive',
+        endpoint: 'maimild_archive',
         queries: {
           limit,
           offset,
@@ -41,10 +41,11 @@ export async function GET() {
     response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
     return response;
   } catch (error) {
-    console.error('Failed to fetch my mail archive:', error);
+    console.error('Failed to fetch maimild archive:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch my mail archive' },
+      { error: 'Failed to fetch maimild archive' },
       { status: 500 }
     );
   }
 }
+

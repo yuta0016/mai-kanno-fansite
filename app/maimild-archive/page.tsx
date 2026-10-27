@@ -13,7 +13,7 @@ const CORNERS = [
 
 const BROADCAST_TYPES = ['ラジオ', '生放送', 'おまけ動画'] as const;
 
-export default function MyMailArchivePage() {
+export default function MaimildArchivePage() {
   const [archives, setArchives] = useState<MyMailArchive[]>([]);
   const [selectedYear, setSelectedYear] = useState<string>('すべて');
   const [selectedCorners, setSelectedCorners] = useState<string[]>([]);
@@ -24,7 +24,7 @@ export default function MyMailArchivePage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await fetch('/api/my-mail-archive');
+        const res = await fetch('/api/maimild-archive');
         const data = await res.json();
         setArchives(data.archives || []);
       } catch (error) {
@@ -119,7 +119,7 @@ export default function MyMailArchivePage() {
       <Breadcrumb
         items={[
           { label: 'ホーム', href: '/' },
-          { label: 'マイペースマイワールドアーカイブ', href: '/my-mail-archive' },
+          { label: 'マイマイルドアーカイブ', href: '/maimild-archive' },
         ]}
       />
 
@@ -127,10 +127,10 @@ export default function MyMailArchivePage() {
         {/* ページタイトル */}
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            マイペースマイワールド アーカイブ
+            マイマイルド アーカイブ
           </h1>
           <p className="text-gray-600">
-            菅野真衣の番組「マイペースマイワールド」の放送内容をアーカイブしています
+            菅野真衣の番組の放送内容をアーカイブしています
           </p>
         </div>
 

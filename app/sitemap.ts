@@ -41,7 +41,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/my-mail-archive`,
+      url: `${baseUrl}/maimild-archive`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,

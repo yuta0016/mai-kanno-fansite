@@ -14,7 +14,7 @@ export default function Header() {
     { href: '/works', label: '出演作品' },
     { href: '/songs', label: '参加楽曲データベース' },
     { href: '/events', label: 'イベント・スケジュール' },
-    { href: '/my-mail-archive', label: 'マイペースマイワールド' },
+    { href: '/maimild-archive', label: 'マイマイルド' },
     { href: '/news', label: '更新履歴' },
     { href: '/contact', label: 'お問い合わせ' },
   ];
