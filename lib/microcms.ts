@@ -150,9 +150,9 @@ export interface MyMailArchive {
     platform: 'YouTube' | 'ニコニコ動画';
     url: string;
   }>; // 放送URL
-  xUrls?: Array<{
-    url: string;
-  }>; // 関連X投稿（最大3つ）
+  xUrl1?: string; // 関連X投稿URL1
+  xUrl2?: string; // 関連X投稿URL2
+  xUrl3?: string; // 関連X投稿URL3
   displayOrder?: number; // 表示順
   createdAt: string;
   updatedAt: string;

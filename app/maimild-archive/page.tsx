@@ -309,21 +309,23 @@ export default function MaimildArchivePage() {
                 )}
 
                 {/* 関連X投稿 */}
-                {archive.xUrls && archive.xUrls.length > 0 && (
+                {(archive.xUrl1 || archive.xUrl2 || archive.xUrl3) && (
                   <div className="mb-4">
                     <h4 className="text-sm font-semibold text-gray-700 mb-3">関連X投稿</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {archive.xUrls.map((item, index) => (
-                        <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                          <a 
-                            href={item.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-500 hover:underline break-all text-sm"
-                          >
-                            {item.url}
-                          </a>
-                        </div>
+                      {[archive.xUrl1, archive.xUrl2, archive.xUrl3].map((url, index) => (
+                        url && (
+                          <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                            <a 
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline break-all text-sm"
+                            >
+                              {url}
+                            </a>
+                          </div>
+                        )
                       ))}
                     </div>
                   </div>
