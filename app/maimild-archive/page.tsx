@@ -141,46 +141,105 @@ export default function MaimildArchivePage() {
         </div>
 
         {/* フィルターセクション */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">フィルター</h2>
-          
-          {/* 放送年フィルター */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              放送年
-            </label>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSelectedYear('すべて')}
-                className={`px-4 py-2 rounded-md transition-colors ${
-                  selectedYear === 'すべて'
-                    ? 'bg-pink-500 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                }`}
-              >
-                すべて
-              </button>
-              {availableYears.map(year => (
+        <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* 放送年フィルター */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">放送年</h3>
+              <div className="flex flex-wrap gap-2">
                 <button
-                  key={year}
-                  onClick={() => setSelectedYear(year)}
-                  className={`px-4 py-2 rounded-md transition-colors ${
-                    selectedYear === year
+                  onClick={() => setSelectedYear('すべて')}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    selectedYear === 'すべて'
                       ? 'bg-pink-500 text-white'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {year}年
+                  すべて
                 </button>
-              ))}
+                {availableYears.map(year => (
+                  <button
+                    key={year}
+                    onClick={() => setSelectedYear(year)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedYear === year
+                        ? 'bg-pink-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {year}年
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 放送種別フィルター */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">放送種別</h3>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedType('すべて')}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    selectedType === 'すべて'
+                      ? 'bg-pink-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  すべて
+                </button>
+                {BROADCAST_TYPES.map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setSelectedType(type)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedType === type
+                        ? 'bg-pink-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* コーナーフィルター */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">コーナー</h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedCorners.length > 0 ? (
+                  <>
+                    <button
+                      onClick={() => setSelectedCorners([])}
+                      className="px-4 py-2 rounded-full text-sm font-medium transition-colors bg-pink-500 text-white"
+                    >
+                      {selectedCorners.length}個選択中
+                    </button>
+                    <button
+                      onClick={() => setSelectedCorners([])}
+                      className="px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    >
+                      解除
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="px-4 py-2 rounded-full text-sm font-medium transition-colors bg-pink-500 text-white"
+                  >
+                    選択なし
+                  </button>
+                )}
+              </div>
+              {selectedCorners.length === 0 && (
+                <div className="mt-2 text-xs text-gray-600">
+                  複数選択可（チェックボックスで選択）
+                </div>
+              )}
             </div>
           </div>
 
-          {/* コーナーフィルター */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              コーナー（複数選択可）
-            </label>
+          {/* コーナー選択チェックボックス */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="space-y-2">
               {CORNERS.map(corner => (
                 <label key={corner} className="flex items-center">
@@ -190,46 +249,14 @@ export default function MaimildArchivePage() {
                     onChange={() => toggleCorner(corner)}
                     className="w-4 h-4 text-pink-500 rounded focus:ring-pink-500"
                   />
-                  <span className="ml-2 text-gray-700">{corner}</span>
+                  <span className="ml-2 text-sm text-gray-700">{corner}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          {/* 放送種別フィルター */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              放送種別
-            </label>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSelectedType('すべて')}
-                className={`px-4 py-2 rounded-md transition-colors ${
-                  selectedType === 'すべて'
-                    ? 'bg-pink-500 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                }`}
-              >
-                すべて
-              </button>
-              {BROADCAST_TYPES.map(type => (
-                <button
-                  key={type}
-                  onClick={() => setSelectedType(type)}
-                  className={`px-4 py-2 rounded-md transition-colors ${
-                    selectedType === type
-                      ? 'bg-pink-500 text-white'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* フィルター結果数 */}
-          <div className="text-sm text-gray-600">
+          <div className="mt-4 text-sm text-gray-600">
             結果: {filteredArchives.length}件 / 全{archives.length}件
           </div>
         </div>
