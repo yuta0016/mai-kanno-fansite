@@ -1,8 +1,18 @@
 'use client';
 
 import { MyMailArchive } from '@/lib/microcms';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Breadcrumb from '@/components/Breadcrumb';
+
+declare global {
+  interface Window {
+    twttr?: {
+      widgets?: {
+        load: () => void;
+      };
+    };
+  }
+}
 
 const CORNERS = [
   'ふつうのおおたより',
@@ -13,6 +23,8 @@ const CORNERS = [
 ] as const;
 
 const BROADCAST_TYPES = ['ラジオ', '生放送', 'おまけ動画'] as const;
+
+export const dynamic = 'force-dynamic';
 
 export default function MaimildArchivePage() {
   const [archives, setArchives] = useState<MyMailArchive[]>([]);
@@ -98,8 +110,6 @@ export default function MaimildArchivePage() {
 
   // X投稿の埋め込みコンポーネント
   const TwitterEmbed = ({ url }: { url: string }) => {
-    const embedRef = useRef<HTMLDivElement>(null);
-
     useEffect(() => {
       // Twitterウィジェットを再初期化
       if (window.twttr?.widgets?.load) {
@@ -110,11 +120,9 @@ export default function MaimildArchivePage() {
     const xUrl = url.includes('x.com') ? url : url.replace('twitter.com', 'x.com');
     
     return (
-      <div ref={embedRef} className="flex justify-center my-4">
-        <blockquote className="twitter-tweet">
-          <a href={xUrl}></a>
-        </blockquote>
-      </div>
+      <blockquote className="twitter-tweet">
+        <a href={xUrl}></a>
+      </blockquote>
     );
   };
 
@@ -376,7 +384,7 @@ export default function MaimildArchivePage() {
                 {(archive.xUrl1 || archive.xUrl2 || archive.xUrl3) && (
                   <div className="mb-4">
                     <h4 className="text-sm font-semibold text-gray-700 mb-3">関連X投稿</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="space-y-6">
                       {[archive.xUrl1, archive.xUrl2, archive.xUrl3].map((url, index) => (
                         url && (
                           <div key={index} className="flex justify-center">
@@ -397,14 +405,4 @@ export default function MaimildArchivePage() {
       <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
     </div>
   );
-}
-
-declare global {
-  interface Window {
-    twttr?: {
-      widgets?: {
-        load: () => void;
-      };
-    };
-  }
 }
