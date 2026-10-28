@@ -388,11 +388,11 @@ export default function MaimildArchivePage() {
                 )}
 
                 {/* 関連X投稿 */}
-                {(archive.xUrl1 || archive.xUrl2 || archive.xUrl3) && (
+                {(archive.xUrls1 || archive.xUrls2 || archive.xUrls3) && (
                   <div className="mb-4">
                     <h4 className="text-sm font-semibold text-gray-700 mb-3">関連X投稿</h4>
                     <div className="space-y-6">
-                      {[archive.xUrl1, archive.xUrl2, archive.xUrl3].map((url, index) => (
+                      {[archive.xUrls1, archive.xUrls2, archive.xUrls3].map((url, index) => (
                         url && (
                           <div key={index} className="flex justify-center">
                             <TwitterEmbed url={url} />

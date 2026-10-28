@@ -148,9 +148,9 @@ export interface MyMailArchive {
   broadcastType: ('ラジオ' | '生放送' | 'おまけ動画')[]; // 放送種別（複数選択セレクト）
   broadcastUrlYouTube?: string; // YouTube放送URL
   broadcastUrlNiconico?: string; // ニコニコ動画放送URL
-  xUrl1?: string; // 関連X投稿URL1
-  xUrl2?: string; // 関連X投稿URL2
-  xUrl3?: string; // 関連X投稿URL3
+  xUrls1?: string; // 関連X投稿URL1
+  xUrls2?: string; // 関連X投稿URL2
+  xUrls3?: string; // 関連X投稿URL3
   displayOrder?: number; // 表示順
   createdAt: string;
   updatedAt: string;
