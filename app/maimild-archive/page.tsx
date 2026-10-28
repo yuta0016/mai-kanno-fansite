@@ -1,7 +1,7 @@
 'use client';
 
 import { MyMailArchive } from '@/lib/microcms';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import Breadcrumb from '@/components/Breadcrumb';
 
 const CORNERS = [
@@ -55,7 +55,7 @@ export default function MaimildArchivePage() {
 
   // フィルタリングされたデータ
   const filteredArchives = useMemo(() => {
-    return archives.filter(archive => {
+    const filtered = archives.filter(archive => {
       const archiveYear = new Date(archive.broadcastDate).getFullYear().toString();
       
       // 年度フィルター
@@ -71,13 +71,20 @@ export default function MaimildArchivePage() {
         if (!hasMatchingCorner) return false;
       }
       
-      // 放送種別フィルター
-      if (selectedType !== 'すべて' && archive.broadcastType !== selectedType) {
-        return false;
+      // 放送種別フィルター（配列から最初の要素を取得して比較）
+      if (selectedType !== 'すべて') {
+        const archiveType = Array.isArray(archive.broadcastType)
+          ? archive.broadcastType[0]
+          : archive.broadcastType;
+        if (archiveType !== selectedType) {
+          return false;
+        }
       }
       
       return true;
     });
+    
+    return filtered;
   }, [archives, selectedYear, selectedCorners, selectedType]);
 
   // コーナーフィルターの切り替え
@@ -91,10 +98,19 @@ export default function MaimildArchivePage() {
 
   // X投稿の埋め込みコンポーネント
   const TwitterEmbed = ({ url }: { url: string }) => {
+    const embedRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      // Twitterウィジェットを再初期化
+      if (window.twttr?.widgets?.load) {
+        window.twttr.widgets.load();
+      }
+    }, [url]);
+
     const xUrl = url.includes('x.com') ? url : url.replace('twitter.com', 'x.com');
     
     return (
-      <div className="flex justify-center my-4">
+      <div ref={embedRef} className="flex justify-center my-4">
         <blockquote className="twitter-tweet">
           <a href={xUrl}></a>
         </blockquote>
@@ -363,15 +379,8 @@ export default function MaimildArchivePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {[archive.xUrl1, archive.xUrl2, archive.xUrl3].map((url, index) => (
                         url && (
-                          <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                            <a 
-                              href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:underline break-all text-sm"
-                            >
-                              {url}
-                            </a>
+                          <div key={index} className="flex justify-center">
+                            <TwitterEmbed url={url} />
                           </div>
                         )
                       ))}
@@ -388,4 +397,14 @@ export default function MaimildArchivePage() {
       <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
     </div>
   );
+}
+
+declare global {
+  interface Window {
+    twttr?: {
+      widgets?: {
+        load: () => void;
+      };
+    };
+  }
 }
