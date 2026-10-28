@@ -22,12 +22,7 @@ export default function MyMailArchiveLayout({
       {children}
       <Script
         src="https://platform.twitter.com/widgets.js"
-        strategy="lazyOnload"
-        onLoad={() => {
-          if (typeof window !== 'undefined' && window.twttr?.widgets?.load) {
-            window.twttr.widgets.load();
-          }
-        }}
+        strategy="afterInteractive"
       />
     </>
   );

@@ -55,6 +55,13 @@ export default function MaimildArchivePage() {
     loadData();
   }, []);
 
+  // Twitterウィジェットの再初期化
+  useEffect(() => {
+    if (!loading && typeof window !== 'undefined' && window.twttr?.widgets?.load) {
+      window.twttr.widgets.load();
+    }
+  }, [loading]);
+
   // 利用可能な年度を取得
   const availableYears = useMemo(() => {
     const years = new Set<string>();
