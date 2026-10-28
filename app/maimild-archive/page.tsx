@@ -410,11 +410,7 @@ export default function MaimildArchivePage() {
                       </span>
                       関連X投稿
                     </button>
-                    <div
-                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                        expandedXPosts.has(archive.id) ? 'max-h-[2000px]' : 'max-h-0'
-                      }`}
-                    >
+                    {expandedXPosts.has(archive.id) && (
                       <div className="space-y-6">
                         {[archive.xUrls1, archive.xUrls2, archive.xUrls3].map((url, index) => (
                           url && (
@@ -424,7 +420,7 @@ export default function MaimildArchivePage() {
                           )
                         ))}
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
               </div>
