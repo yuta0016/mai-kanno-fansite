@@ -168,7 +168,7 @@ export default function MaimildArchivePage() {
             マイマイルド アーカイブ
           </h1>
           <p className="text-gray-600">
-            菅野真衣の番組の放送内容をアーカイブしています
+            菅野真衣のマイペースマイワールド♡の各回の放送内容を簡単に紹介しています
           </p>
         </div>
 
