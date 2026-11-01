@@ -3,6 +3,7 @@
 import { MyMailArchive } from '@/lib/microcms';
 import { useEffect, useState, useMemo } from 'react';
 import Breadcrumb from '@/components/Breadcrumb';
+import { ErrorBoundary } from './ErrorBoundary';
 
 declare global {
   interface Window {
@@ -401,38 +402,40 @@ export default function MaimildArchivePage() {
 
                 {/* 関連X投稿 */}
                 {(archive.xUrls1 || archive.xUrls2 || archive.xUrls3) && (
-                  <div className="mb-4">
-                    <button
-                      onClick={() => {
-                        setExpandedXPosts(prev => {
-                          const newSet = new Set(prev);
-                          if (newSet.has(archive.id)) {
-                            newSet.delete(archive.id);
-                          } else {
-                            newSet.add(archive.id);
-                          }
-                          return newSet;
-                        });
-                      }}
-                      className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors cursor-pointer mb-3"
-                    >
-                      <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-200 text-gray-600 transition-transform ${expandedXPosts.has(archive.id) ? 'rotate-45' : ''}`}>
-                        +
-                      </span>
-                      関連X投稿
-                    </button>
-                    {expandedXPosts.has(archive.id) && (
-                      <div className="space-y-6">
-                        {[archive.xUrls1, archive.xUrls2, archive.xUrls3].map((url, index) => (
-                          url && (
-                            <div key={index} className="flex justify-center">
-                              <TwitterEmbed url={url} />
-                            </div>
-                          )
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <ErrorBoundary>
+                    <div className="mb-4">
+                      <button
+                        onClick={() => {
+                          setExpandedXPosts(prev => {
+                            const newSet = new Set(prev);
+                            if (newSet.has(archive.id)) {
+                              newSet.delete(archive.id);
+                            } else {
+                              newSet.add(archive.id);
+                            }
+                            return newSet;
+                          });
+                        }}
+                        className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors cursor-pointer mb-3"
+                      >
+                        <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-200 text-gray-600 transition-transform ${expandedXPosts.has(archive.id) ? 'rotate-45' : ''}`}>
+                          +
+                        </span>
+                        関連X投稿
+                      </button>
+                      {expandedXPosts.has(archive.id) && (
+                        <div className="space-y-6">
+                          {[archive.xUrls1, archive.xUrls2, archive.xUrls3].map((url, index) => (
+                            url && (
+                              <div key={index} className="flex justify-center">
+                                <TwitterEmbed url={url} />
+                              </div>
+                            )
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </ErrorBoundary>
                 )}
               </div>
             ))}
