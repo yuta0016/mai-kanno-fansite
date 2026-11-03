@@ -34,6 +34,9 @@ export default function MaimildArchivePage() {
   const [selectedType, setSelectedType] = useState<string>('すべて');
   const [loading, setLoading] = useState(true);
   const [expandedXPosts, setExpandedXPosts] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [itemsPerPage, setItemsPerPage] = useState<number>(25);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   // データ取得
   useEffect(() => {
@@ -75,6 +78,11 @@ export default function MaimildArchivePage() {
     }
   }, [expandedXPosts]);
 
+  // フィルタ条件が変更されたらページを1に戻す
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedYear, selectedCorners, selectedType, searchQuery, itemsPerPage]);
+
   // 利用可能な年度を取得
   const availableYears = useMemo(() => {
     const years = new Set<string>();
@@ -113,11 +121,25 @@ export default function MaimildArchivePage() {
         }
       }
       
+      // 検索クエリによるフィルタリング
+      if (searchQuery !== '') {
+        const searchFields = [
+          new Date(archive.broadcastDate).toLocaleDateString('ja-JP'),
+          archive.content,
+          archive.corners.join(' '),
+          Array.isArray(archive.broadcastType) ? archive.broadcastType[0] : archive.broadcastType,
+        ];
+        const searchMatch = searchFields.some(field => 
+          field?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        if (!searchMatch) return false;
+      }
+      
       return true;
     });
     
     return filtered;
-  }, [archives, selectedYear, selectedCorners, selectedType]);
+  }, [archives, selectedYear, selectedCorners, selectedType, searchQuery]);
 
   // コーナーフィルターの切り替え
   const toggleCorner = (corner: string) => {
@@ -127,6 +149,12 @@ export default function MaimildArchivePage() {
         : [...prev, corner]
     );
   };
+
+  // ページネーション計算
+  const totalPages = Math.ceil(filteredArchives.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedArchives = filteredArchives.slice(startIndex, endIndex);
 
   // X投稿の埋め込みコンポーネント
   const TwitterEmbed = ({ url }: { url: string }) => {
@@ -182,6 +210,41 @@ export default function MaimildArchivePage() {
           <p className="text-gray-600">
             菅野真衣のマイペースマイワールド♡の各回の放送内容を簡単に紹介しています
           </p>
+        </div>
+
+        {/* 検索ボックスと表示件数選択 */}
+        <div className="mb-6 bg-white rounded-lg shadow-sm p-4 space-y-4">
+          {/* 検索ボックス */}
+          <div>
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">キーワード検索</label>
+            <input
+              type="text"
+              placeholder="日付、内容、コーナー名などで検索..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+            />
+          </div>
+
+          {/* 表示件数選択 */}
+          <div>
+            <label className="text-sm font-semibold text-gray-700 mb-2 block">表示件数</label>
+            <div className="flex gap-2">
+              {[10, 25, 50].map(perPage => (
+                <button
+                  key={perPage}
+                  onClick={() => setItemsPerPage(perPage)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    itemsPerPage === perPage
+                      ? 'bg-pink-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {perPage}件
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* フィルターセクション */}
@@ -313,23 +376,24 @@ export default function MaimildArchivePage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-6">
-            {filteredArchives.map(archive => (
-              <div key={archive.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-                {/* ヘッダー部分 */}
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 pb-4 border-b border-gray-200">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {new Date(archive.broadcastDate).toLocaleDateString('ja-JP', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        weekday: 'short',
-                      })}
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="inline-block px-3 py-1 bg-pink-100 text-pink-800 text-sm rounded-full">
-                        {archive.broadcastType}
+          <>
+            <div className="space-y-6">
+              {paginatedArchives.map(archive => (
+                <div key={archive.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                  {/* ヘッダー部分 */}
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 pb-4 border-b border-gray-200">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        {new Date(archive.broadcastDate).toLocaleDateString('ja-JP', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          weekday: 'short',
+                        })}
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="inline-block px-3 py-1 bg-pink-100 text-pink-800 text-sm rounded-full">
+                          {archive.broadcastType}
                       </span>
                     </div>
                   </div>
@@ -439,7 +503,43 @@ export default function MaimildArchivePage() {
                 )}
               </div>
             ))}
-          </div>
+            </div>
+
+            {/* ページネーション */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex justify-center items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
+                >
+                  前へ
+                </button>
+                <div className="flex gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`px-3 py-2 rounded-lg ${
+                        currentPage === pageNum
+                          ? 'bg-pink-500 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
+                >
+                  次へ
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
