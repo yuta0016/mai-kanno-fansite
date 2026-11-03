@@ -213,9 +213,9 @@ export default function MaimildArchivePage() {
         </div>
 
         {/* 検索ボックスと表示件数選択 */}
-        <div className="mb-6 bg-white rounded-lg shadow-sm p-4 space-y-4">
+        <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
           {/* 検索ボックス */}
-          <div>
+          <div className="mb-4">
             <label className="text-sm font-semibold text-gray-700 mb-2 block">キーワード検索</label>
             <input
               type="text"
@@ -227,23 +227,20 @@ export default function MaimildArchivePage() {
           </div>
 
           {/* 表示件数選択 */}
-          <div>
-            <label className="text-sm font-semibold text-gray-700 mb-2 block">表示件数</label>
-            <div className="flex gap-2">
-              {[10, 25, 50].map(perPage => (
-                <button
-                  key={perPage}
-                  onClick={() => setItemsPerPage(perPage)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    itemsPerPage === perPage
-                      ? 'bg-pink-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {perPage}件
-                </button>
-              ))}
-            </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="itemsPerPage" className="text-sm text-gray-600">
+              表示件数:
+            </label>
+            <select
+              id="itemsPerPage"
+              value={itemsPerPage}
+              onChange={(e) => setItemsPerPage(Number(e.target.value))}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+            >
+              <option value={10}>10件</option>
+              <option value={25}>25件</option>
+              <option value={50}>50件</option>
+            </select>
           </div>
         </div>
 
